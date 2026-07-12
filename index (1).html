@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weekend Go-Town — mapping the Hillcroft corridor and its suburbs</title>
+<meta name="description" content="An interactive public-history map testing whether Houston's Indian community moved from Hillcroft to Katy, or decoupled: dispersed residence, concentrated commerce." />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F6F3;
+  --paper-2:#EFEDE7;
+  --ink:#15181C;
+  --ink-soft:#5A6068;
+  --rule:#D6D3CA;
+  --topper:#A8232E;      /* the red trim on the Gandhi District street toppers */
+  --guide:#1F4739;       /* Texas highway guide-sign green */
+  --core:#15181C;
+  --focus:#0B63CE;
+  --c-business:#8A5A1F;
+  --c-restaurant:#A8232E;
+  --c-religious:#1F4739;
+  --c-civic:#2C4B6E;
+  --c-milestone:#5B3A72;
+  --c-lead:#8A8378;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--rule);padding:34px 0 26px;background:var(--paper)}
+.slug{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--topper);display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.slug::before{content:"";width:26px;height:3px;background:var(--topper)}
+h1{font-size:clamp(30px,4.4vw,52px);line-height:1.02;max-width:16ch}
+h1 em{font-style:normal;color:var(--topper)}
+.thesis{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:44px;margin-top:22px;align-items:start}
+.dek{font-size:16.5px;color:var(--ink-soft);max-width:56ch}
+.dek strong{color:var(--ink);font-weight:600}
+blockquote{margin:0;padding-left:18px;border-left:3px solid var(--guide);font-size:16px}
+blockquote p{margin:0 0 8px}
+blockquote cite{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em;display:block}
+
+/* ---------- workspace ---------- */
+.workspace{display:grid;grid-template-columns:236px minmax(0,1fr) 320px;gap:0;border-bottom:1px solid var(--rule)}
+.rail,.detail{padding:22px 20px;border-right:1px solid var(--rule);background:var(--paper-2)}
+.detail{border-right:0;border-left:1px solid var(--rule);overflow-y:auto}
+.rail{overflow-y:auto}
+.stage{position:relative;min-height:560px}
+#map{position:absolute;inset:0;background:var(--paper-2)}
+.leaflet-container{font-family:"IBM Plex Sans",sans-serif;background:#E8E6DF}
+
+.rail h2,.detail h2{font-size:12px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.rail section{margin-bottom:22px}
+.opt{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:13.5px}
+.opt input{accent-color:var(--topper);margin:0;flex:none}
+.opt .swatch{width:9px;height:9px;border-radius:50%;flex:none}
+.opt .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft)}
+.opt.dim{opacity:.42}
+input[type=search]{width:100%;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);border-radius:0;font:inherit;font-size:13.5px}
+.btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);padding:6px 9px;cursor:pointer;color:var(--ink-soft)}
+.btn:hover{border-color:var(--ink);color:var(--ink)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- detail panel ---------- */
+.empty{color:var(--ink-soft);font-size:13.5px}
+.rec-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;line-height:1.15;margin:6px 0 2px}
+.rec-year{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--topper);letter-spacing:.04em}
+.rec-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft);margin:10px 0;padding:8px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:3px}
+.rec-meta b{font-weight:400;color:var(--ink)}
+.rec-sum{font-size:14px}
+.facts{margin:12px 0 0;padding:0;list-style:none;font-size:13.5px}
+.facts li{padding-left:14px;position:relative;margin-bottom:5px}
+.facts li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--rule)}
+.prompt{margin-top:14px;padding:11px 12px;background:var(--paper);border-left:3px solid var(--guide);font-size:13px}
+.prompt span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--guide);margin-bottom:4px}
+.srcs{margin-top:14px;font-size:12.5px}
+.srcs a{display:block;margin-bottom:4px;color:var(--ink-soft)}
+.srcs a:hover{color:var(--ink)}
+.flag{margin-top:12px;padding:10px 12px;background:#FBF0D9;border-left:3px solid #C08A1E;font-size:12.5px}
+
+/* evidence pills */
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.pill.high{color:var(--guide)}
+.pill.medium{color:#8A5A1F}
+.pill.lead{color:var(--c-lead)}
+.pill.disputed{color:var(--topper)}
+
+/* ---------- markers ---------- */
+.pin{display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .12s}
+.pin.approx{border-style:dashed;border-color:var(--paper);opacity:.9}
+.pin.sel{transform:scale(1.45);box-shadow:0 0 0 3px var(--ink)}
+.pin.closed{background:var(--paper)!important;box-shadow:inset 0 0 0 3px currentColor,0 1px 3px rgba(0,0,0,.35)}
+
+/* ---------- drift chart ---------- */
+.drift{padding:26px 0 40px}
+.drift-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:14px}
+.drift-head h2{font-size:22px}
+.drift-head p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:64ch}
+#drift{width:100%;height:340px;display:block}
+.dx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-soft)}
+.dot{cursor:pointer}
+.dot:hover{stroke:var(--ink);stroke-width:2}
+
+/* ---------- scrubber ---------- */
+.scrub{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-2);padding:16px 0}
+.scrub .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.scrub label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.year{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;min-width:3.6ch}
+input[type=range]{flex:1;min-width:220px;accent-color:var(--topper)}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+
+footer{padding:30px 0 60px;color:var(--ink-soft);font-size:12.5px}
+footer p{max-width:78ch}
+
+@media (max-width:1080px){
+  .workspace{grid-template-columns:1fr}
+  .rail,.detail{border:0;border-bottom:1px solid var(--rule)}
+  .stage{min-height:440px;height:60vh}
+  .thesis{grid-template-columns:1fr;gap:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="slug">Public-history research prototype &middot; draft dataset</div>
+    <h1>Three hundred grocery stores. <em>One</em> Karat 22.</h1>
+    <div class="thesis">
+      <p class="dek">The standard story is a migration: Indian Houston starts on Hillcroft in the 1980s and moves west to Sugar Land, Stafford, and Katy. Plot the sites by year and by distance from Hillcroft &amp; Harwin and that story does not hold. What the evidence shows instead is <strong>sorting.</strong> Businesses you use weekly followed people out to the suburbs, because nobody drives twenty miles for onions. Businesses you use rarely and spend real money at &mdash; gold, wedding saris, sweets for a hundred guests &mdash; stayed on Hillcroft, because for those, people will drive. And a third set went the other way entirely, into the inner loop, selling Indian food to a customer who was never Indian at all. <em>[This paragraph is a placeholder written by a machine. Rewrite it in your own words.]</em></p>
+      <blockquote>
+        <p>&ldquo;There are lots more resources now than before. When we came thirty years ago, even the Indian grocery store was hard to find, and now there are around 300.&rdquo;</p>
+        <cite>Sonal Bhuchar, oral history interview, Houston Asian American Archive, Rice University<br><b style="color:#A8232E">[CONFIRM INTERVIEW DATE AND VERBATIM WORDING AGAINST THE TRANSCRIPT BEFORE PUBLISHING]</b></cite>
+      </blockquote>
+    </div>
+  </div>
+</header>
+
+<div class="scrub">
+  <div class="wrap">
+    <label for="year">Show sites established through</label>
+    <span class="year mono" id="yearOut">2026</span>
+    <input type="range" id="year" min="1973" max="2026" value="2026" step="1" />
+    <span class="count" id="count"></span>
+    <button class="btn" id="play" type="button">Play 1973&ndash;2026</button>
+  </div>
+</div>
+
+<div class="workspace">
+  <aside class="rail">
+    <section>
+      <h2>Search</h2>
+      <input type="search" id="q" placeholder="Raja Sweets, temple, grocer&hellip;" />
+    </section>
+    <section>
+      <h2>Category</h2>
+      <div id="fCat"></div>
+    </section>
+    <section>
+      <h2>Zone</h2>
+      <div id="fZone"></div>
+    </section>
+    <section>
+      <h2>Evidence</h2>
+      <div id="fEv"></div>
+    </section>
+    <section>
+      <h2>View</h2>
+      <div class="btnrow">
+        <button class="btn on" id="tRings" type="button">Distance rings</button>
+        <button class="btn" id="tAxis" type="button">Chart: west only</button>
+        <button class="btn" id="reset" type="button">Reset all</button>
+      </div>
+    </section>
+  </aside>
+
+  <div class="stage"><div id="map"></div></div>
+
+  <aside class="detail" id="detail">
+    <h2>Record</h2>
+    <p class="empty">Select a marker on the map, or a dot on the drift chart below, to read the record, its evidence level, and the interview question it raises.</p>
+  </aside>
+</div>
+
+<div class="wrap drift">
+  <div class="drift-head">
+    <div>
+      <h2>The drift test</h2>
+      <p>Horizontal: year established. Vertical: straight-line miles west of Hillcroft &amp; Harwin. A migration would show the whole cloud climbing away from the baseline. What you see instead is a core that keeps adding sites at zero miles while a second cloud opens up ten to twenty miles out — two centers, not one moving one.</p>
+    </div>
+    <div class="count mono" id="driftStat"></div>
+  </div>
+  <svg id="drift" role="img" aria-label="Scatter plot of sites by year established and distance west of Hillcroft"></svg>
+</div>
+
+<footer class="wrap">
+  <p><b>Status:</b> starter dataset of <span id="nTotal"></span> records, not a finished archive. Dashed markers have approximate coordinates and must be field-verified before publication. Records marked <span class="pill lead">lead</span> are not yet facts. Two dates in the original dataset were corrected against the Houston History Magazine account of the district — see the disputed flags on Raja Sweets and Himalaya.</p>
+  <p>Basemap &copy; OpenStreetMap contributors. Built for the <i>From Hillcroft to Katy</i> project.</p>
+</footer>
+
+<script id="data" type="application/json">
+{
+  "anchor": {"name":"Hillcroft & Harwin","lat":29.7205,"lng":-95.5016},
+  "locations": [
+  {
+    "id":"icc-1973","name":"India Culture Center founded","cat":"Civic","zone":"Regional","year":1973,
+    "yearLabel":"June 27, 1973","ev":"high","coord":"approximate",
+    "lat":29.6663,"lng":-95.5142,"address":"No permanent home until India House (8888 W. Bellfort); plotted at India House",
+    "summary":"An umbrella organization formed by University of Houston students and professionals more than a decade before Hillcroft had a single Indian storefront. Community infrastructure preceded commercial infrastructure — the reverse of how the district's story is usually told.",
+    "facts":[
+      "Founded June 27, 1973; Dr. Harb S. Hayre was its first president (1973–75).",
+      "The Indian community in Houston at the time was roughly 5,000 people, mostly students, engineers, and physicians.",
+      "ICC later drove both the Gandhi statue in Hermann Park and the 2010 district designation.",
+      "Coordinates are a placeholder: ICC had no building of its own until India House."
+    ],
+    "prompt":"Where did the community actually gather in the 1970s, before there was a district or a building — whose living rooms, which campus rooms, which rented halls?",
+    "srcs":[{"l":"India Culture Center — official history","u":"https://icchoustontx.org/history/"},{"l":"Indo American News, ICC at 40","u":"https://indoamerican-news.com/india-culture-center-icc-looking-back-a-journey-of-40-years/"}]
+  },
+  {
+    "id":"meenakshi","name":"Sri Meenakshi Devasthanam","cat":"Religious","zone":"Regional","year":1977,
+    "yearLabel":"1977 society · 1982 shrine · 1995 rajagopuram","ev":"high","coord":"approximate",
+    "lat":29.5327,"lng":-95.2976,"address":"17130 McLean Road, Pearland, TX 77584",
+    "summary":"A permanent Hindu temple complex was built on the metropolitan fringe years before Hillcroft was a commercial district. Worship suburbanized first, and it suburbanized in a direction — southeast to Pearland — that has nothing to do with the Katy story.",
+    "facts":[
+      "Temple society established 1977; main shrine inaugurated 1982.",
+      "Rajagopuram and corner temples completed 1995.",
+      "Sits southeast of the core, not west — a counterweight to any tidy westward narrative."
+    ],
+    "prompt":"Why Pearland? Who chose the site, what did the land cost, and how far were families willing to drive in 1982?",
+    "srcs":[{"l":"Temple history and source trail","u":"https://en.wikipedia.org/wiki/Sri_Meenakshi_Temple_(Brazoria_County,_Texas)"},{"l":"Official temple site","u":"https://www.meenakshi.org/"}]
+  },
+  {
+    "id":"baps","name":"BAPS Shri Swaminarayan Mandir","cat":"Religious","zone":"Fort Bend / Stafford","year":1977,
+    "yearLabel":"1977 gatherings · 1988 first mandir · 2004 stone mandir","ev":"high","coord":"approximate",
+    "lat":29.6046,"lng":-95.5787,"address":"1150 Brand Lane, Stafford, TX 77477",
+    "summary":"Began as prayer meetings in private homes in 1977 and ended as a hand-carved stone mandir in Stafford in 2004. The single clearest case of a Fort Bend institution built for people who already lived in Fort Bend.",
+    "facts":[
+      "Devotees began gathering in private homes after a 1977 visit by Pramukh Swami Maharaj.",
+      "The 2004 mandir was assembled from roughly 33,000 hand-carved marble and limestone pieces shipped from India.",
+      "Built with no iron or steel in the structure."
+    ],
+    "prompt":"When the congregation outgrew living rooms, why did it build in Stafford rather than near Hillcroft — land price, membership geography, or zoning?",
+    "srcs":[{"l":"BAPS Houston history","u":"https://en.wikipedia.org/wiki/BAPS_Shri_Swaminarayan_Mandir_Houston"},{"l":"Visit Houston, cultural centers","u":"https://www.visithoustontexas.com/blog/post/debut-in-hou-cultural-centers-in-houston/"}]
+  },
+  {
+    "id":"karat22","name":"Karat 22 Jewelers","cat":"Business","zone":"Hillcroft core","year":1984,
+    "yearLabel":"1984","ev":"high","coord":"approximate",
+    "lat":29.7222,"lng":-95.5017,"address":"5623 Hillcroft Avenue, Houston, TX 77036",
+    "summary":"Aku and Meena Patel opened Karat 22 in 1984 — the earliest firmly dated Indian-owned business on Hillcroft in this dataset, and notably not a restaurant. The district began with gold, not food.",
+    "facts":[
+      "Opened 1984 at 5623 Hillcroft Avenue by Aku and Meena Patel.",
+      "Described as one of the first Indian American entrepreneurs on the street; other merchants followed.",
+      "Gold is a high-value, low-frequency purchase — exactly the kind that survives customer dispersal, because people will drive for it."
+    ],
+    "prompt":"Why Hillcroft in 1984 — what did the rent look like, and who was the landlord?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"}]
+  },
+  {
+    "id":"strip-mall","name":"The strip-mall condition","cat":"Milestone","zone":"Hillcroft core","year":1984,
+    "yearLabel":"early-to-mid 1980s","ev":"medium","coord":"approximate",
+    "lat":29.7175,"lng":-95.5014,"address":"Hillcroft–Harwin corridor, Greater Sharpstown",
+    "summary":"Not a business — a precondition. Developers including Ed Wulfe were building cheap strip retail across Greater Sharpstown just as the oil bust softened rents. Hillcroft was not chosen because it was Indian; it became Indian partly because it was available and cheap, near the freeway, and unzoned in a city with no zoning.",
+    "facts":[
+      "Houston's strip-center boom made Hillcroft and Harwin prime low-cost retail space in the early 1980s.",
+      "Houston has no conventional zoning code; Katy and Sugar Land developments are governed by deed restrictions and master plans that make a dense immigrant retail strip far harder to reproduce.",
+      "This is the structural claim the essay has to prove: the district's location was made by land economics, not by preference."
+    ],
+    "prompt":"Ask a broker, not a shopkeeper: what did a Hillcroft storefront rent for in 1985 versus a comparable space in Sugar Land, and what did a lease require?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"}]
+  },
+  {
+    "id":"india-grocers","name":"India Grocers","cat":"Business","zone":"Hillcroft core","year":1986,
+    "yearLabel":"mid-1980s (exact year unconfirmed)","ev":"medium","coord":"approximate",
+    "lat":29.7197,"lng":-95.5012,"address":"Original Hillcroft address not yet confirmed",
+    "summary":"Yatin Patel's grocery was among the district's pioneering stores. Groceries are the load-bearing business of an ethnic commercial district: weekly, perishable, and therefore the first thing you would expect to follow customers into the suburbs.",
+    "facts":[
+      "Described as first opening on Hillcroft in the mid-1980s.",
+      "Founder: Yatin Patel.",
+      "Original address and exact year still need directory or business-record confirmation."
+    ],
+    "prompt":"Groceries are the test case. When customers moved to Katy, did the store follow, open a second location, or stay put and let them drive?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"}]
+  },
+  {
+    "id":"raja-sweets","name":"Raja Sweets","cat":"Restaurant","zone":"Hillcroft core","year":1986,
+    "yearLabel":"1986","ev":"high","coord":"approximate","flag":"Your starter dataset listed \"1985–1986 (sources differ).\" The 1986 date is now the stronger one: LaRotta interviewed founder Joginder \"Yogi\" Gahunia's daughter, who gives 1986. Treat 1985 as a Wikipedia artifact unless a 1985 ad or filing turns up.",
+    "lat":29.7219,"lng":-95.5015,"address":"5667 Hillcroft Avenue, Houston, TX 77036",
+    "summary":"Founded 1986 by Joginder \"Yogi\" Gahunia, later called one of the founding fathers of Hillcroft. He led the campaign for official district recognition and died in 2002, eight years before it happened. His widow Resham and daughter Sharan still run the shop.",
+    "facts":[
+      "Founded 1986; Gahunia arrived in the early 1980s and found no Indian restaurants in Houston.",
+      "He first tried to rename Hillcroft Avenue itself for Gandhi; the petition failed against non-Indian property owners.",
+      "The India Culture Center then pivoted to street-sign toppers — the achievable version of the same claim.",
+      "Its gulab jamun reportedly draws customers from Atlanta and London — the definition of a destination business."
+    ],
+    "prompt":"Sharan Gahunia has given interviews before. Ask her the thing reporters don't: did the family ever seriously consider opening in Sugar Land or Katy, and why didn't they?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"},{"l":"Texas Highways on the district","u":"https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/"}]
+  },
+  {
+    "id":"subhlaxmi","name":"Subhlaxmi Grocers","cat":"Business","zone":"Hillcroft core","year":1995,
+    "yearLabel":"founding year unknown — placeholder","ev":"lead","coord":"approximate",
+    "lat":29.7160,"lng":-95.5010,"address":"Hillcroft; address and founding date to confirm",
+    "summary":"A second-generation family grocery. Co-owner Animesh Patel described the district's growth as demand-led: population first, then groceries, then restaurants. Useful precisely because he is second-generation and can speak to both eras.",
+    "facts":[
+      "Now operates as a chain — check whether its later stores went to Sugar Land, Stafford, or Katy, and when.",
+      "The 1995 year on this map is a placeholder only. Do not cite it.",
+      "Animesh Patel is a strong interview candidate: second-generation, family business, expansion decisions."
+    ],
+    "prompt":"You run more than one store now. Walk me through the decision to open the second one — who was the customer you were chasing, and where did they live?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"},{"l":"Subhlaxmi Grocers","u":"https://subhlaxmigrocers.com/"}]
+  },
+  {
+    "id":"himalaya","name":"Himalaya Restaurant","cat":"Restaurant","zone":"Hillcroft core","year":2004,
+    "yearLabel":"2004 (a prior Lashkari eatery, early 1990s)","ev":"medium","coord":"approximate",
+    "lat":29.7139,"lng":-95.5006,"address":"6652 Southwest Freeway, Houston, TX 77074",
+    "flag":"Your starter dataset had 1994, high confidence, sourced to GQ. Houston History Magazine — which interviewed Kaiser Lashkari directly — says Himalaya opened in 2004 and that he ran a different restaurant nearby in the early 1990s. The GQ date probably collapsed the two. Downgraded to disputed; resolve with a health-permit or DBA filing.",
+    "summary":"Kaiser Lashkari's Pakistani restaurant is now the district's most nationally visible business. Its date is contested in print, which makes it a good demonstration of why oral history needs paper.",
+    "facts":[
+      "Lashkari's own account: he was on Hillcroft in the early 1990s with a prior eatery; Himalaya itself opened in 2004.",
+      "He describes the early 1980s as when Indian and Pakistani businessmen put roots on Hillcroft.",
+      "A Pakistani-owned restaurant inside an Indian-designated district — the map's categories are cleaner than the neighborhood is."
+    ],
+    "prompt":"Which restaurant came first, and where exactly was it? Then: your fame is national now — did that ever make leaving Hillcroft tempting?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"},{"l":"GQ, New Classic American Restaurants (gives 1994)","u":"https://www.gq.com/story/new-classic-american-restaurants"}]
+  },
+  {
+    "id":"agas","name":"Aga's Restaurant — original","cat":"Restaurant","zone":"Southwest / Stafford edge","year":2001,
+    "yearLabel":"2001 · expanded 2011","ev":"high","coord":"approximate",
+    "lat":29.6519,"lng":-95.5714,"address":"11842 Wilcrest Drive, Houston, TX 77031",
+    "summary":"Opened away from Hillcroft, on the southwest edge toward Stafford. Evidence that a second commercial gravity well was already forming before Katy existed as a South Asian market.",
+    "facts":["Opened 2001; expanded 2011.","Sits between the Hillcroft core and Fort Bend — geographically, an intermediate step."],
+    "prompt":"Why not Hillcroft? In 2001, what did being off the strip cost you, and what did it buy you?",
+    "srcs":[{"l":"Chronicle on Aga's expansion and history","u":"https://www.chron.com/food/article/houston-restaurant-agas-opening-katy-21314083.php"}]
+  },
+  {
+    "id":"india-house","name":"India House","cat":"Civic","zone":"Southwest / Stafford edge","year":2007,
+    "yearLabel":"2000 land purchase · built 2003–2007","ev":"medium","coord":"approximate",
+    "lat":29.6663,"lng":-95.5142,"address":"8888 West Bellfort Avenue, Houston, TX 77031",
+    "summary":"Thirty-four years after the India Culture Center was founded, the community finally built itself a building — and put it southwest of the core, not on it. Where a community puts its civic center is a statement about where it thinks its people are.",
+    "facts":[
+      "A 10-acre parcel was purchased in 2000; construction ran roughly 2003–2007.",
+      "Runs youth, wellness, and after-school programming — not a commercial function.",
+      "Its executive director has estimated around 150,000 people of Indian background now live in greater Houston."
+    ],
+    "prompt":"The site selection is the whole story. Who was on the committee, what other parcels were considered, and was Fort Bend ever on the table?",
+    "srcs":[{"l":"India Culture Center history","u":"https://icchoustontx.org/history/"},{"l":"Authentic Texas on the district","u":"https://authentictexas.com/houstons-mahatma-gandhi-district-celebrates-south-asian-culture/"}]
+  },
+  {
+    "id":"designation","name":"Mahatma Gandhi District designated","cat":"Milestone","zone":"Hillcroft core","year":2010,
+    "yearLabel":"January 16, 2010","ev":"high","coord":"approximate",
+    "lat":29.7205,"lng":-95.5016,"address":"Hillcroft between the Southwest Freeway and Westpark Tollway",
+    "summary":"The district received its name in 2010 — decades after it was built, and, crucially, well after the suburban dispersal was underway. Official recognition arrived when the neighborhood had already stopped being where most of its customers lived. That timing is the argument.",
+    "facts":[
+      "Mayor Annise Parker proclaimed January 16, 2010 as Mahatma Gandhi District Day.",
+      "It followed a failed attempt to rename Hillcroft Avenue outright — city rules require signatures from 50% of property owners, and non-Indian owners resisted.",
+      "Parker described the designation as claiming turf: a way of saying we are a vital part of Houston.",
+      "A designation is a jurisdictional act. Ask who benefits from a name that has no legal or zoning force."
+    ],
+    "prompt":"Push on the failed street-renaming: which merchants refused to sign, and what does that tell us about who else owned this street?",
+    "srcs":[{"l":"LaRotta, \"Pass the Naan,\" Houston History Magazine 13:1","u":"https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf"},{"l":"Texas Highways","u":"https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/"}]
+  },
+  {
+    "id":"katy-temple","name":"Sai Durga Shiva Vishnu Temple, Katy","cat":"Religious","zone":"Greater Katy","year":2013,
+    "yearLabel":"2013–2014 (details to verify)","ev":"medium","coord":"approximate",
+    "lat":29.6924,"lng":-95.8268,"address":"Katy area; address to confirm",
+    "summary":"Worship follows residence. A temple in Katy is a far stronger signal that families live there than a restaurant is — you drive across town for gulab jamun, not for a weekly puja.",
+    "facts":[
+      "Temples are the best proxy in this dataset for where people actually sleep, not where they shop.",
+      "Founding details and current status need direct confirmation from the temple.",
+      "If the drift argument holds anywhere, it holds in the Religious category — check whether the religious dots move west earlier than the commercial ones."
+    ],
+    "prompt":"How far were founding families driving to worship before this existed, and at what point did that drive become unacceptable?",
+    "srcs":[{"l":"Greater Katy religious history","u":"https://en.wikipedia.org/wiki/Greater_Katy"}]
+  },
+  {
+    "id":"katy-asian-town","name":"Katy Asian Town & H Mart","cat":"Business","zone":"Greater Katy","year":2018,
+    "yearLabel":"2018","ev":"high","coord":"approximate",
+    "lat":29.7894,"lng":-95.7758,"address":"23119 Colonial Parkway, Katy, TX 77493",
+    "summary":"The suburban answer to Hillcroft — and note the difference. It is pan-Asian, developer-built, master-planned, and anchored by a Korean supermarket chain. Hillcroft accreted, one lease at a time. Katy Asian Town was designed.",
+    "facts":[
+      "Opened 2018 as a planned Asian-oriented retail center.",
+      "Pan-Asian, not Indian-specific: the suburban format aggregates ethnicity rather than concentrating one.",
+      "The contrast in how the two districts came into being is the single sharpest comparison in the project."
+    ],
+    "prompt":"Whose idea was this center, who leased first, and was it pitched to tenants as a Katy project or as a Hillcroft alternative?",
+    "srcs":[{"l":"Eater Houston on Katy Asian Town","u":"https://houston.eater.com/maps/katy-asian-town-best-restaurants-houston"}]
+  },
+  {
+    "id":"gandhi-museum","name":"Eternal Gandhi Museum Houston","cat":"Civic","zone":"Southwest / Stafford edge","year":2022,
+    "yearLabel":"opened late 2022","ev":"lead","coord":"unverified",
+    "lat":29.6700,"lng":-95.5250,"address":"Southwest Houston, near Beltway 8 — COORDINATES NOT VERIFIED",
+    "summary":"A museum built to memorialize the community's presence — placed near Beltway 8 rather than in the district that already carries Gandhi's name. Worth asking why the commemorative institution and the commemorated street are not in the same place.",
+    "facts":[
+      "This marker's location is a placeholder. Confirm the address before you show this map to anyone.",
+      "Commemoration tends to arrive after the thing being commemorated has changed — the same pattern as the 2010 designation."
+    ],
+    "prompt":"Why here and not on Hillcroft, where the Gandhi signs already are?",
+    "srcs":[{"l":"Texas Highways (mentions the museum's planned opening)","u":"https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/"}]
+  },
+  {
+    "id":"agas-katy","name":"Aga's Restaurant — Katy","cat":"Restaurant","zone":"Greater Katy","year":2026,
+    "yearLabel":"June 24, 2026","ev":"high","coord":"approximate",
+    "lat":29.7758,"lng":-95.7750,"address":"Katy, TX",
+    "summary":"The newest node, and the cleanest test of the whole thesis: Aga's did not move to Katy. It added Katy. The original stayed open. That is expansion, not migration — and it is the sentence your essay is arguing toward.",
+    "facts":[
+      "Opened June 2026 as an additional location, not a relocation.",
+      "The original Wilcrest restaurant remains in operation.",
+      "This is the pattern to look for across every business in the dataset: did anyone actually close a core location to move west?"
+    ],
+    "prompt":"Twenty-five years apart, two restaurants, one family. What is the customer in Katy buying that the customer on Wilcrest isn't?",
+    "srcs":[{"l":"Houston Chronicle on the Katy opening","u":"https://www.houstonchronicle.com/food-restaurants/article/agas-katy-open-monday-22281060.php"}]
+  },
+  {
+    "id":"indika","name":"Indika","cat":"Restaurant","zone":"Inner Loop","year":2001,
+    "yearLabel":"July 2001 · moved to Montrose 2006 · CLOSED 2016","ev":"medium","coord":"approximate","closed":2016,
+    "lat":29.7448,"lng":-95.3939,"address":"516 Westheimer Rd (final location); original 2001–2006 address NOT CONFIRMED",
+    "flag":"Two live source conflicts. (1) Original location: her own bio says a small space in southwest Houston; Houston Food Finder says Memorial. The 2001–2006 pin is therefore unplaceable and this marker sits at the Montrose address. (2) In a 2013 interview Jaisinghani said Indika opened in 2002 — her own restaurant's website says 2001. She misremembered her own founding year by a year. Write that down: you are about to read fifty oral histories, and this is what they do.",
+    "summary":"Anita Jaisinghani's Indika was Indian food sold to Houston, not Indian food sold to Indian Houston. National press — the Wall Street Journal, USA Today, Time — of a kind no Hillcroft business ever got. It ran fifteen years and shut in 2016. It is the only documented closure on this map, and note where it happened: not on Hillcroft.",
+    "facts":[
+      "Opened July 2001. Jaisinghani arrived in Houston from Canada in 1990 and worked the pastry station at Café Annie before opening her own room.",
+      "Moved to 516 Westheimer in Montrose in April 2006; closed in 2016.",
+      "Roughly 6 miles EAST of Hillcroft — the opposite direction from Katy.",
+      "The only business here documented to have closed. The core has lost none."
+    ],
+    "prompt":"Her HAAA oral history transcript exists. Read it and find out: why not Hillcroft? What could she charge in Montrose that she couldn't charge on the strip, and who walked through the door?",
+    "srcs":[{"l":"Pondicheri — chef biography","u":"https://www.pondicheri.com/our-team/"},{"l":"Houston Food Finder (operated Indika 2001–2016)","u":"https://houstonfoodfinder.com/news/new-indian-cookbook-from-houston-chef-ready-to-add-to-your-collection/"},{"l":"Recipe for Success chef bio (July 2001, moved 2006)","u":"https://www.recipe4success.org/chefs/anita-jaisinghani.html"}]
+  },
+  {
+    "id":"pondicheri","name":"Pondicheri","cat":"Restaurant","zone":"Inner Loop","year":2011,
+    "yearLabel":"March 1, 2011","ev":"high","coord":"approximate",
+    "lat":29.7419,"lng":-95.4153,"address":"2800 Kirby Drive, Houston, TX 77098",
+    "summary":"Jaisinghani's second restaurant, on Kirby, deliberately cheaper and more casual than Indika — she has said she wanted street-level food with mass appeal. Twenty-five years after Raja Sweets opened on Hillcroft, Indian food in Houston had a third address: not the enclave, not the suburb, but the affluent inner loop.",
+    "facts":[
+      "Opened March 1, 2011 at 2800 Kirby Drive.",
+      "Bake Lab + Shop added upstairs in 2014; a New York outpost ran until 2020.",
+      "About 5 miles EAST of Hillcroft — plotting below the baseline on the drift chart, with Rice.",
+      "Multiple-time James Beard semifinalist and nominee."
+    ],
+    "prompt":"The Kirby customer and the Hillcroft customer are not the same person. Did she think of Hillcroft as competition, as origin, or as irrelevant?",
+    "srcs":[{"l":"Pondicheri — chef biography","u":"https://www.pondicheri.com/our-team/"},{"l":"Interview: opened March 1, 2011; 2800 Kirby","u":"http://www.inspiringhoustonwomen.com/2013/12/anita-jaisinghani.html"}]
+  },
+  {
+    "id":"sikh-center","name":"Sikh Center of the Gulf Coast Area","cat":"Religious","zone":"Northwest Houston","year":1972,
+    "yearLabel":"1972 founded by five families · building inaugurated November 1973","ev":"high","coord":"unverified",
+    "lat":29.8800,"lng":-95.5280,"address":"8819 Prairie Drive, Houston, TX 77064 — COORDINATES NOT VERIFIED, geocode this",
+    "flag":"Your date was November 1973. That is the BUILDING INAUGURATION — the congregation dates its golden jubilee from November 2023. The ORGANIZATION was founded by five families in 1972. Both facts are true and they are different facts. Your own source log told you to keep them apart. Record both.",
+    "summary":"The first Gurdwara in the state of Texas, and the oldest South Asian religious institution in this dataset — older than the India Culture Center, older than Meenakshi, twelve years older than the first Indian business on Hillcroft. Five families bought two acres on Prairie Drive for $10,000 and cleared the grass themselves with hand mowers roped together. It is approved for a Texas Historical Marker.",
+    "facts":[
+      "The first Sikhs arrived in Houston around 1971, drawn by the oil boom and the Texas Medical Center.",
+      "Land at 8819 Prairie Drive: two acres, $10,000. The seller refused to split the tract.",
+      "An electrical fire damaged both floors in December 1987. Golden domes and a facade rebuild followed, 2016–2019.",
+      "IT IS IN NORTHWEST HOUSTON. Not Hillcroft, not Katy, not Fort Bend, not the inner loop. A fifth direction."
+    ],
+    "prompt":"Why northwest? In 1972 there was no enclave to be near — so what actually determined the site? Follow the money: who found the land, and what else was for sale that year?",
+    "srcs":[{"l":"Sikh Center of the Gulf Coast Area — official site (founded 1972)","u":"https://sikhcenterhouston.org/"},{"l":"SikhNet, A Brief History of The Sikh Center, Houston","u":"https://www.sikhnet.com/news/brief-history-sikh-center-houston"}]
+  },
+  {
+    "id":"sikh-national","name":"Sikh National Center","cat":"Religious","zone":"Northwest Houston","year":2006,
+    "yearLabel":"33 acres bought Dec 1999 · groundbreaking Nov 4, 2006","ev":"high","coord":"unverified",
+    "lat":29.9200,"lng":-95.5300,"address":"7500 North Sam Houston Pkwy W (Beltway 8 at Fairbanks) — COORDINATES NOT VERIFIED",
+    "summary":"You did not ask for this one. Add it anyway — it may be the most useful record on the map. The congregation left the old gurdwara for two stated reasons: it had outgrown the building, and a landfill was being developed on the land directly behind it. So they bought 33 acres on a beltway. This is an institution moving outward for reasons that have nothing to do with preference, prosperity, or assimilation.",
+    "facts":[
+      "In their own words: they were outgrowing the small, aging gurdwara, and a huge landfill was going in behind the property.",
+      "33 acres on North Beltway 8 purchased in December 1999; groundbreaking November 4, 2006.",
+      "Roughly 5,000 Sikhs in greater Houston as of 2003.",
+      "A landfill. Not upward mobility. Write that down."
+    ],
+    "prompt":"Get the city records on that landfill — siting date, permits, who objected. This is the paper trail that turns an anecdote into an argument.",
+    "srcs":[{"l":"Sikh National Center — About (landfill, 33 acres, groundbreaking)","u":"https://sikhnationalcenter.org/about/"}]
+  },
+  {
+    "id":"bombay-sweets","name":"Bombay Sweets","cat":"Restaurant","zone":"Hillcroft core","year":1997,
+    "yearLabel":"1997","ev":"medium","coord":"approximate",
+    "lat":29.7210,"lng":-95.5013,"address":"5827 Hillcroft Avenue, Houston, TX 77036",
+    "flag":"The year (1997) is solid. The claim 'first pure vegetarian Indian restaurant in Houston' is NOT independently verified — it originates from the restaurant's own marketing and is repeated verbatim by Yelp, DoorDash, and aggregators, which is what a self-claim looks like when it circulates. Record it as the restaurant's claim about itself, not as a fact.",
+    "summary":"A vegetarian restaurant and sweet shop on Hillcroft, and the room where the Houston History article that anchors this whole project begins — Alex LaRotta was eating here in 2010 when he first noticed the new Gandhi street toppers overhead.",
+    "facts":[
+      "Opened 1997 at 5827 Hillcroft Avenue; still operating.",
+      "Says of itself that it was Houston's first pure vegetarian Indian restaurant. Unverified.",
+      "Arrives eleven years after Raja Sweets — the core was still ADDING businesses in the late 1990s, not shedding them."
+    ],
+    "prompt":"Who came in 1997 that wasn't coming in 1986? A pure-vegetarian restaurant implies a customer base big enough to sustain one. What changed?",
+    "srcs":[{"l":"Houstonia Magazine (serving since 1997)","u":"https://www.houstoniamag.com/businesses/bombay-sweets"},{"l":"Bombay Sweets — official site","u":"https://www.bombaysweetshtx.com/"}]
+  },
+  {
+    "id":"haaa","name":"Houston Asian American Archive (Rice)","cat":"Civic","zone":"Regional","year":2009,
+    "yearLabel":"founded 2009","ev":"high","coord":"approximate",
+    "lat":29.7174,"lng":-95.4018,"address":"Rice University, Houston, TX 77005",
+    "summary":"Not a subject — a partner. HAAA has been recording Asian American oral histories in Houston since 2009 and holds interviews, consent protocols, and methods you should be borrowing rather than reinventing.",
+    "facts":[
+      "Founded 2009 at Rice University.",
+      "Email them before you record a single interview. Ask for their consent form and their release language.",
+      "Their existing interviews may already contain Hillcroft merchants — check before you cold-call anyone."
+    ],
+    "prompt":"For the archivist, not a narrator: which Hillcroft or Fort Bend interviews do you already hold, and what would it take to deposit mine with you?",
+    "srcs":[{"l":"Houston Asian American Archive","u":"https://haaa.rice.edu/"}]
+  },
+  {
+    "id":"jay-stores","name":"Jay Stores (research lead)","cat":"Lead","zone":"Hillcroft core","year":1983,
+    "yearLabel":"c. 1983 — unconfirmed","ev":"lead","coord":"unverified",
+    "lat":29.7208,"lng":-95.5017,"address":"Address unconfirmed",
+    "summary":"Carried over from your starter dataset as an open question. If a 1983 Indian business on Hillcroft can be documented, it predates Karat 22 and changes the district's origin date.",
+    "facts":[
+      "Nothing here is confirmed. Do not use this record in writing yet.",
+      "Check Houston city directories and telephone books, 1982–1986.",
+      "Also check Harris County assumed-name (DBA) filings — a DBA is dated, indexed, and public."
+    ],
+    "prompt":"Ask longtime merchants who was already here when they arrived. Origin stories are competitive; collect several.",
+    "srcs":[{"l":"Mahatma Gandhi District — source trail","u":"https://en.wikipedia.org/wiki/Mahatma_Gandhi_District,_Houston"}]
+  }
+  ]
+}
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+(function(){
+"use strict";
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const ANCHOR = DATA.anchor;
+const RECS = DATA.locations;
+
+const CAT = {
+  "Business":     "var(--c-business)",
+  "Restaurant":   "var(--c-restaurant)",
+  "Religious":    "var(--c-religious)",
+  "Civic":        "var(--c-civic)",
+  "Milestone":    "var(--c-milestone)",
+  "Lead":         "var(--c-lead)"
+};
+const CAT_HEX = {
+  "Business":"#8A5A1F","Restaurant":"#A8232E","Religious":"#1F4739",
+  "Civic":"#2C4B6E","Milestone":"#5B3A72","Lead":"#8A8378"
+};
+const EV_LABEL = {high:"High confidence",medium:"Medium",lead:"Research lead"};
+
+/* signed miles WEST of the Hillcroft & Harwin anchor (east is negative) */
+function milesWest(r){
+  const lat0 = ANCHOR.lat * Math.PI/180;
+  const dxMi = (ANCHOR.lng - r.lng) * 69.172 * Math.cos(lat0); // west positive
+  return dxMi;
+}
+function milesFrom(r){
+  const lat0 = ANCHOR.lat * Math.PI/180;
+  const dx = (r.lng - ANCHOR.lng) * 69.172 * Math.cos(lat0);
+  const dy = (r.lat - ANCHOR.lat) * 69.05;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+RECS.forEach(r => { r.west = milesWest(r); r.dist = milesFrom(r); });
+
+const state = {
+  year: 2026,
+  q: "",
+  cats: new Set(Object.keys(CAT)),
+  zones: new Set(RECS.map(r=>r.zone)),
+  evs: new Set(["high","medium","lead"]),
+  sel: null,
+  rings: true,
+  axis: "west"
+};
+
+/* ---------- map ---------- */
+const map = L.map("map",{zoomControl:true,scrollWheelZoom:true}).setView([29.71,-95.63],10);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{
+  maxZoom:19, subdomains:"abcd",
+  attribution:'&copy; OpenStreetMap &copy; CARTO'
+}).addTo(map);
+
+const ringLayer = L.layerGroup().addTo(map);
+[5,10,15,20].forEach(mi=>{
+  L.circle([ANCHOR.lat,ANCHOR.lng],{
+    radius: mi*1609.34, fill:false, color:"#15181C", weight:1,
+    opacity:.18, dashArray:"3 5"
+  }).addTo(ringLayer);
+  L.marker([ANCHOR.lat + (mi/69.05), ANCHOR.lng],{
+    icon:L.divIcon({className:"",html:`<div style="font:600 10px 'IBM Plex Mono',monospace;color:#5A6068;transform:translate(-50%,-50%);white-space:nowrap">${mi} mi</div>`})
+  }).addTo(ringLayer);
+});
+L.circleMarker([ANCHOR.lat,ANCHOR.lng],{radius:4,color:"#15181C",fillColor:"#15181C",fillOpacity:1,weight:0})
+  .addTo(map).bindTooltip("Hillcroft &amp; Harwin — the origin",{direction:"top"});
+
+const markerLayer = L.layerGroup().addTo(map);
+const pins = new Map();
+
+function isClosed(r){ return r.closed && state.year >= r.closed; }
+function makeIcon(r, selected){
+  const size = r.cat==="Milestone" ? 12 : 15;
+  const shut = isClosed(r);
+  const cls = "pin" + (r.coord!=="exact" ? " approx":"") + (selected ? " sel":"") + (shut ? " closed":"");
+  return L.divIcon({
+    className:"",
+    html:`<div class="${cls}" style="width:${size}px;height:${size}px;background:${CAT_HEX[r.cat]};color:${CAT_HEX[r.cat]}"></div>`,
+    iconSize:[size,size], iconAnchor:[size/2,size/2]
+  });
+}
+RECS.forEach(r=>{
+  const m = L.marker([r.lat,r.lng],{icon:makeIcon(r,false),title:r.name,riseOnHover:true});
+  m.on("click",()=>select(r.id));
+  m.bindTooltip(`<b>${r.name}</b><br><span style="font-family:'IBM Plex Mono',monospace;font-size:10px">${r.yearLabel}</span>`,{direction:"top",offset:[0,-8]});
+  pins.set(r.id,m);
+});
+
+/* ---------- filters ---------- */
+function visible(r){
+  if (r.year > state.year) return false;
+  if (!state.cats.has(r.cat)) return false;
+  if (!state.zones.has(r.zone)) return false;
+  if (!state.evs.has(r.ev)) return false;
+  if (state.q){
+    const hay = (r.name+" "+r.summary+" "+r.zone+" "+r.address).toLowerCase();
+    if (!hay.includes(state.q)) return false;
+  }
+  return true;
+}
+
+function buildFilter(host, items, set, swatchFor){
+  host.innerHTML = "";
+  items.forEach(v=>{
+    const id = host.id+"-"+v.replace(/\W+/g,"");
+    const lab = document.createElement("label");
+    lab.className = "opt"; lab.htmlFor = id;
+    lab.innerHTML =
+      `<input type="checkbox" id="${id}" checked>` +
+      (swatchFor ? `<span class="swatch" style="background:${swatchFor(v)}"></span>` : "") +
+      `<span>${swatchFor ? v : (EV_LABEL[v]||v)}</span><span class="n" data-n="${v}"></span>`;
+    lab.querySelector("input").addEventListener("change",e=>{
+      e.target.checked ? set.add(v) : set.delete(v);
+      render();
+    });
+    host.appendChild(lab);
+  });
+}
+buildFilter(document.getElementById("fCat"), Object.keys(CAT), state.cats, v=>CAT_HEX[v]);
+buildFilter(document.getElementById("fZone"), [...new Set(RECS.map(r=>r.zone))], state.zones, null);
+buildFilter(document.getElementById("fEv"), ["high","medium","lead"], state.evs, null);
+
+/* ---------- detail ---------- */
+function select(id){
+  state.sel = (state.sel===id) ? null : id;
+  render();
+  if (state.sel){
+    const r = RECS.find(x=>x.id===id);
+    map.panTo([r.lat,r.lng],{animate:true});
+    document.getElementById("detail").scrollTop = 0;
+  }
+}
+function renderDetail(){
+  const host = document.getElementById("detail");
+  const r = RECS.find(x=>x.id===state.sel);
+  if (!r){
+    host.innerHTML = `<h2>Record</h2><p class="empty">Select a marker on the map, or a dot on the drift chart below, to read the record, its evidence level, and the interview question it raises.</p>`;
+    return;
+  }
+  const evClass = r.flag ? "disputed" : r.ev;
+  const evText  = r.flag ? "Disputed date" : EV_LABEL[r.ev];
+  host.innerHTML = `
+    <h2>Record</h2>
+    <span class="pill ${evClass}">${evText}</span>
+    <div class="rec-name">${r.name}</div>
+    <div class="rec-year">${r.yearLabel}</div>
+    <div class="rec-meta">
+      <div>category &nbsp;<b>${r.cat}</b></div>
+      <div>zone &nbsp;<b>${r.zone}</b></div>
+      <div>distance &nbsp;<b>${r.dist.toFixed(1)} mi from Hillcroft &amp; Harwin</b></div>
+      <div>coordinates &nbsp;<b>${r.coord}</b></div>
+      ${r.closed ? `<div>closed &nbsp;<b style="color:var(--topper)">${r.closed}</b></div>` : ""}
+      <div>address &nbsp;<b>${r.address}</b></div>
+    </div>
+    <p class="rec-sum">${r.summary}</p>
+    ${r.flag ? `<div class="flag"><b>Correction to your dataset.</b> ${r.flag}</div>` : ""}
+    <ul class="facts">${r.facts.map(f=>`<li>${f}</li>`).join("")}</ul>
+    <div class="prompt"><span>Interview question</span>${r.prompt}</div>
+    <div class="srcs">${r.srcs.map(s=>`<a href="${s.u}" target="_blank" rel="noopener">&rarr; ${s.l}</a>`).join("")}</div>
+  `;
+}
+
+/* ---------- drift chart ---------- */
+const svg = document.getElementById("drift");
+const NS = "http://www.w3.org/2000/svg";
+function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+function renderDrift(){
+  const W = svg.clientWidth || 900, H = 340;
+  const M = {t:16,r:18,b:34,l:52};
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  svg.innerHTML = "";
+
+  const useWest = state.axis === "west";
+  const val = r => useWest ? r.west : r.dist;
+  const x0=1972, x1=2026, y0 = useWest ? -14 : -1, y1=22;
+  const X = y => M.l + (y-x0)/(x1-x0) * (W-M.l-M.r);
+  const Y = m => H-M.b - (m-y0)/(y1-y0) * (H-M.t-M.b);
+
+  // gridlines
+  [-10,-5,0,5,10,15,20].forEach(m=>{
+    svg.appendChild(el("line",{x1:M.l,x2:W-M.r,y1:Y(m),y2:Y(m),stroke:"#D6D3CA","stroke-width":1}));
+    const t = el("text",{x:M.l-8,y:Y(m)+3,"text-anchor":"end",class:"dx"});
+    t.textContent = m===0 ? "0 — core" : (m<0 ? Math.abs(m)+" E" : m+(useWest?" W":" mi"));
+    svg.appendChild(t);
+  });
+  // zero baseline emphasised
+  svg.appendChild(el("line",{x1:M.l,x2:W-M.r,y1:Y(0),y2:Y(0),stroke:"#15181C","stroke-width":1.5}));
+
+  [1980,1990,2000,2010,2020].forEach(y=>{
+    svg.appendChild(el("line",{x1:X(y),x2:X(y),y1:M.t,y2:H-M.b,stroke:"#E5E2DA","stroke-width":1}));
+    const t=el("text",{x:X(y),y:H-M.b+18,"text-anchor":"middle",class:"dx"});
+    t.textContent=y; svg.appendChild(t);
+  });
+
+  // scrub marker
+  svg.appendChild(el("line",{x1:X(state.year),x2:X(state.year),y1:M.t,y2:H-M.b,stroke:"#A8232E","stroke-width":1,"stroke-dasharray":"3 3","opacity":".6"}));
+
+  const ax = el("text",{x:W-M.r,y:M.t+12,"text-anchor":"end",class:"dx"});
+  ax.textContent = useWest ? "↑ west of Hillcroft & Harwin   ·   ↓ east" : "↑ straight-line miles from Hillcroft & Harwin (any direction)";
+  svg.appendChild(ax);
+
+  RECS.forEach(r=>{
+    const on = visible(r);
+    const shut = isClosed(r);
+    const c = el("circle",{
+      cx:X(r.year), cy:Y(val(r)), r: state.sel===r.id ? 9 : 6,
+      fill: shut ? "#F7F6F3" : CAT_HEX[r.cat],
+      stroke: shut ? CAT_HEX[r.cat] : "none",
+      "stroke-width": shut ? 2.5 : 0,
+      class:"dot",
+      opacity: on ? (state.sel && state.sel!==r.id ? .35 : .92) : .1
+    });
+    if (state.sel===r.id){ c.setAttribute("stroke","#15181C"); c.setAttribute("stroke-width","2"); }
+    c.style.pointerEvents = on ? "auto" : "none";
+    c.addEventListener("click",()=>select(r.id));
+    const ttl = el("title"); ttl.textContent = `${r.name} — ${r.yearLabel} — ${r.dist.toFixed(1)} mi from the core`;
+    c.appendChild(ttl);
+    svg.appendChild(c);
+  });
+
+  const shown = RECS.filter(visible);
+  const core = shown.filter(r=>Math.abs(r.west) < 2).length;
+  const west = shown.filter(r=>r.west >= 8).length;
+  const east = shown.filter(r=>r.west <= -2).length;
+  const shut = shown.filter(isClosed).length;
+  const shutCore = shown.filter(r=>isClosed(r) && Math.abs(r.west) < 2).length;
+  document.getElementById("driftStat").innerHTML =
+    `${core} at the core &middot; ${west} west &middot; ${east} east<br>` +
+    `${shut} closed &mdash; <b>${shutCore} of them at the core</b>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  markerLayer.clearLayers();
+  const counts = {};
+  RECS.forEach(r=>{
+    if (visible(r)){
+      const m = pins.get(r.id);
+      m.setIcon(makeIcon(r, state.sel===r.id));
+      markerLayer.addLayer(m);
+    }
+    if (r.year <= state.year){
+      counts[r.cat]=(counts[r.cat]||0)+1;
+      counts[r.zone]=(counts[r.zone]||0)+1;
+      counts[r.ev]=(counts[r.ev]||0)+1;
+    }
+  });
+  document.querySelectorAll(".n").forEach(n=>{
+    const k = n.dataset.n;
+    n.textContent = counts[k] || "";
+    n.parentElement.classList.toggle("dim", !counts[k]);
+  });
+  const shown = RECS.filter(visible).length;
+  document.getElementById("count").textContent = `${shown} of ${RECS.length} records shown`;
+  ringLayer.eachLayer(l=>{ l.setStyle && l.setStyle({opacity: state.rings?.18:0}); });
+  document.getElementById("tRings").classList.toggle("on", state.rings);
+  renderDetail();
+  renderDrift();
+}
+document.getElementById("nTotal").textContent = RECS.length;
+
+/* ---------- controls ---------- */
+const yr = document.getElementById("year");
+yr.addEventListener("input",e=>{
+  state.year = +e.target.value;
+  document.getElementById("yearOut").textContent = state.year;
+  render();
+});
+document.getElementById("q").addEventListener("input",e=>{ state.q = e.target.value.trim().toLowerCase(); render(); });
+document.getElementById("tAxis").addEventListener("click",e=>{
+  state.axis = state.axis === "west" ? "radial" : "west";
+  e.target.textContent = state.axis === "west" ? "Chart: west only" : "Chart: all directions";
+  e.target.classList.toggle("on", state.axis === "radial");
+  render();
+});
+document.getElementById("tRings").addEventListener("click",()=>{
+  state.rings = !state.rings;
+  state.rings ? ringLayer.addTo(map) : map.removeLayer(ringLayer);
+  render();
+});
+document.getElementById("reset").addEventListener("click",()=>{
+  state.year=2026; yr.value=2026; document.getElementById("yearOut").textContent=2026;
+  state.q=""; document.getElementById("q").value="";
+  state.sel=null;
+  document.querySelectorAll(".rail input[type=checkbox]").forEach(c=>c.checked=true);
+  state.cats=new Set(Object.keys(CAT));
+  state.zones=new Set(RECS.map(r=>r.zone));
+  state.evs=new Set(["high","medium","lead"]);
+  map.setView([29.71,-95.63],10);
+  render();
+});
+
+let timer=null;
+document.getElementById("play").addEventListener("click",e=>{
+  if (timer){ clearInterval(timer); timer=null; e.target.textContent="Play 1973–2026"; return; }
+  state.year = 1973; e.target.textContent="Stop";
+  timer = setInterval(()=>{
+    state.year++;
+    if (state.year > 2026){ clearInterval(timer); timer=null; e.target.textContent="Play 1973–2026"; state.year=2026; }
+    yr.value = state.year;
+    document.getElementById("yearOut").textContent = state.year;
+    render();
+  }, 110);
+});
+
+window.addEventListener("resize", renderDrift);
+render();
+})();
+</script>
+</body>
+</html>
