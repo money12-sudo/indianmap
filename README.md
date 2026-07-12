@@ -1,1 +1,1 @@
-Map of Indian Business's in Houston overtime. 
+Map of Indian Businesses in Houston over time. 
