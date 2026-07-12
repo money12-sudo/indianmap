@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About &mdash; From Hillcroft to Katy</title>
+<meta name="description" content="A public history project documenting the commercial, religious, and civic geography of South Asian Houston, 1972 to the present." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F6F3;
+  --paper-2:#EFEDE7;
+  --ink:#15181C;
+  --ink-soft:#5A6068;
+  --rule:#D6D3CA;
+  --topper:#A8232E;      /* the red trim on the Gandhi District street toppers */
+  --guide:#1F4739;       /* Texas highway guide-sign green */
+  --core:#15181C;
+  --focus:#0B63CE;
+  --c-business:#8A5A1F;
+  --c-restaurant:#A8232E;
+  --c-religious:#1F4739;
+  --c-civic:#2C4B6E;
+  --c-milestone:#5B3A72;
+  --c-lead:#8A8378;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--rule);padding:34px 0 26px;background:var(--paper)}
+.slug{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--topper);display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.slug::before{content:"";width:26px;height:3px;background:var(--topper)}
+h1{font-size:clamp(28px,3.4vw,42px);line-height:1.08;max-width:22ch}
+.sub{font-family:"IBM Plex Sans",sans-serif;font-size:17px;color:var(--ink-soft);margin:8px 0 0;font-style:italic}
+h1 em{font-style:normal;color:var(--topper)}
+.thesis{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:44px;margin-top:22px;align-items:start}
+.dek{font-size:15.5px;color:var(--ink-soft);max-width:62ch;margin:0 0 12px}
+.dek strong{color:var(--ink);font-weight:600}
+blockquote{margin:0;padding-left:18px;border-left:3px solid var(--guide);font-size:16px}
+blockquote p{margin:0 0 8px}
+blockquote cite{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em;display:block}
+
+/* ---------- workspace ---------- */
+.workspace{display:grid;grid-template-columns:236px minmax(0,1fr) 320px;gap:0;border-bottom:1px solid var(--rule)}
+.rail,.detail{padding:22px 20px;border-right:1px solid var(--rule);background:var(--paper-2)}
+.detail{border-right:0;border-left:1px solid var(--rule);overflow-y:auto}
+.rail{overflow-y:auto}
+.stage{position:relative;min-height:560px}
+#map{position:absolute;inset:0;background:var(--paper-2)}
+.leaflet-container{font-family:"IBM Plex Sans",sans-serif;background:#E8E6DF}
+
+.rail h2,.detail h2{font-size:12px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.rail section{margin-bottom:22px}
+.opt{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:13.5px}
+.opt input{accent-color:var(--topper);margin:0;flex:none}
+.opt .swatch{width:9px;height:9px;border-radius:50%;flex:none}
+.opt .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft)}
+.opt.dim{opacity:.42}
+input[type=search]{width:100%;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);border-radius:0;font:inherit;font-size:13.5px}
+.btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);padding:6px 9px;cursor:pointer;color:var(--ink-soft)}
+.btn:hover{border-color:var(--ink);color:var(--ink)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- detail panel ---------- */
+.empty{color:var(--ink-soft);font-size:13.5px}
+.rec-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;line-height:1.15;margin:6px 0 2px}
+.rec-year{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--topper);letter-spacing:.04em}
+.rec-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft);margin:10px 0;padding:8px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:3px}
+.rec-meta b{font-weight:400;color:var(--ink)}
+.rec-sum{font-size:14px}
+.facts{margin:12px 0 0;padding:0;list-style:none;font-size:13.5px}
+.facts li{padding-left:14px;position:relative;margin-bottom:5px}
+.facts li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--rule)}
+.prompt{margin-top:14px;padding:11px 12px;background:var(--paper);border-left:3px solid var(--guide);font-size:13px}
+.prompt span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--guide);margin-bottom:4px}
+.srcs{margin-top:14px;font-size:12.5px}
+.srcs a{display:block;margin-bottom:4px;color:var(--ink-soft)}
+.srcs a:hover{color:var(--ink)}
+.flag{margin-top:12px;padding:10px 12px;background:#FBF0D9;border-left:3px solid #C08A1E;font-size:12.5px}
+
+/* evidence pills */
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.pill.high{color:var(--guide)}
+.pill.medium{color:#8A5A1F}
+.pill.lead{color:var(--c-lead)}
+.pill.disputed{color:var(--topper)}
+
+/* ---------- markers ---------- */
+.pin{display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .12s}
+.pin.approx{border-style:dashed;border-color:var(--paper);opacity:.9}
+.pin.sel{transform:scale(1.45);box-shadow:0 0 0 3px var(--ink)}
+.pin.closed{background:var(--paper)!important;box-shadow:inset 0 0 0 3px currentColor,0 1px 3px rgba(0,0,0,.35)}
+
+/* ---------- drift chart ---------- */
+.drift{padding:26px 0 40px}
+.drift-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:14px}
+.drift-head h2{font-size:22px}
+.drift-head p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:64ch}
+#drift{width:100%;height:340px;display:block}
+.dx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-soft)}
+.dot{cursor:pointer}
+.dot:hover{stroke:var(--ink);stroke-width:2}
+
+/* ---------- scrubber ---------- */
+.scrub{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-2);padding:16px 0}
+.scrub .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.scrub label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.year{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;min-width:3.6ch}
+input[type=range]{flex:1;min-width:220px;accent-color:var(--topper)}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+
+footer{padding:30px 0 60px;color:var(--ink-soft);font-size:12.5px}
+footer p{max-width:78ch}
+
+@media (max-width:1080px){
+  .workspace{grid-template-columns:1fr}
+  .rail,.detail{border:0;border-bottom:1px solid var(--rule)}
+  .stage{min-height:440px;height:60vh}
+  .thesis{grid-template-columns:1fr;gap:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.nav{display:flex;gap:22px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{color:var(--ink-soft);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.nav a.here{color:var(--topper);border-bottom:2px solid var(--topper);padding-bottom:2px}
+.nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:.06em}
+
+.page{max-width:720px;margin:0 auto;padding:52px 24px 90px}
+.page h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1;max-width:20ch;margin-bottom:6px}
+.page .sub{font-family:"IBM Plex Sans";font-style:italic;color:var(--ink-soft);font-size:17px;margin:0 0 40px}
+.page h2{font-size:13px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--topper);margin:44px 0 12px;padding-top:18px;border-top:1px solid var(--rule)}
+.page p{font-size:16px;line-height:1.62;margin:0 0 16px;color:#2A2F35}
+.page p.lede{font-size:18.5px;line-height:1.55;color:var(--ink)}
+.page ul{padding-left:0;list-style:none;margin:0 0 16px}
+.page ul li{position:relative;padding-left:20px;margin-bottom:9px;font-size:15.5px;line-height:1.55;color:#2A2F35}
+.page ul li::before{content:"";position:absolute;left:0;top:10px;width:6px;height:1px;background:var(--topper)}
+.page blockquote{margin:24px 0;padding:0 0 0 20px;border-left:3px solid var(--guide);font-size:16px;color:#2A2F35}
+.page blockquote cite{display:block;margin-top:8px;font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft)}
+.page .fine{font-size:13.5px;color:var(--ink-soft)}
+.page a{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="nav">
+    <span class="brand">From Hillcroft to Katy</span>
+    <a href="index.html">The map</a>
+    <a href="about.html" class="here">About</a>
+    <a href="sources.html">Sources</a>
+    <a href="media.html">Media &amp; artifacts</a>
+    <a href="scholarship.html">Scholarship</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>From Hillcroft to Katy</h1>
+  <p class="sub">A public history project on the geography of South Asian Houston</p>
+
+  <p class="lede">This project documents the commercial, religious, and civic geography of South Asian Houston from 1972 to the present: where the community built its businesses and institutions, when, and why in those places rather than others.</p>
+
+  <h2>On the name</h2>
+  <p>The project is named for the account it was built to test, not for the conclusion it reached.</p>
+  <p>The familiar story runs in one direction. A community concentrates on Hillcroft Avenue in the 1980s, prospers, and moves west to Sugar Land, Stafford, and Katy, leaving an older district behind. It is the story usually told about immigrant enclaves in American cities: arrival, consolidation, departure, assimilation.</p>
+  <p>The evidence does not support it. No business in this dataset is documented to have closed on Hillcroft in order to relocate outward. The corridor was still opening new establishments in the late 1990s. Institutions did expand outward, but in every direction at once. The oldest gurdwara was founded northwest of the city in 1972, the largest temple southeast in Pearland, and two of the most visible restaurants east, in Montrose and Upper Kirby. There is no line from Hillcroft to Katy. There is a scatter, and the line is what you get by choosing two points and drawing between them.</p>
+
+  <h2>The argument</h2>
+  <p>What the sites show is sorting: commercial function differentiating across an expanding metropolitan region, rather than a community moving from one place to another.</p>
+  <p>Trade that is frequent and low-value follows its customers. Nobody drives twenty miles for onions, so groceries opened in Sugar Land and Katy as families settled there. Trade that is infrequent and high-value does not have to follow anyone. People will drive for gold, for wedding clothes, for sweets ordered by the hundred, and so the jewelers, the sari shops, and the sweet houses stayed on Hillcroft. A third group emerged later and went the other way entirely, into the inner loop, selling Indian food at inner-loop prices to a clientele that was largely not Indian.</p>
+  <p>Three geographies, three customers, one community.</p>
+
+  <h2>Why it matters</h2>
+  <p>Suburbanization is usually narrated as something that simply happened: a natural consequence of prosperity, mobility, and time. This project starts from the assumption that it did not simply happen, and that the causes can be recovered.</p>
+  <p>Some are already in the record. Houston has no zoning code, which is part of why a dense corridor of small immigrant storefronts could form on Hillcroft, and part of why it could not be reproduced in a master-planned suburb governed by deed restrictions. The Sikh congregation that left its first gurdwara in northwest Houston did not leave because it had prospered. It left, by its own account, because a landfill was being developed on the land behind the building.</p>
+  <p>Municipal decisions, land economics, regulatory structures. Made by people other than the community that lived with them, and retold afterward as a story about upward mobility. The difference between what happened and how it gets explained is what this project is for.</p>
+
+  <h2>What this is</h2>
+  <ul>
+    <li>A working dataset of twenty-three records, with an evidence level attached to each.</li>
+    <li>Not a business directory. Sites are here because they bear on the argument, not because the list is complete.</li>
+    <li>Not a substitute for the archives it points toward. Most opening dates for this corridor are not online. They are in county assumed-name filings, in Houston city directories, and in the memories of the people who opened the doors.</li>
+  </ul>
+
+  <h2>Method</h2>
+  <ul>
+    <li>Records marked as research leads are unverified. Coordinates given as approximate or unverified have not been confirmed in the field.</li>
+    <li>Where published sources disagree on a date, both are recorded and the disagreement is stated rather than settled quietly.</li>
+    <li>An organization's founding is kept separate from a building's opening, consecration, relocation, or expansion. These get collapsed routinely, and collapsing them produces false chronologies.</li>
+    <li>Oral testimony is used to recover experience and interpretation, not to fix dates. One restaurateur in this dataset gave the wrong year for her own restaurant. Consequential claims are checked against directories, filings, advertisements, or the contemporary press.</li>
+  </ul>
+
+  <h2>Sources</h2>
+  <p>The dataset draws on Alex LaRotta's history of the Mahatma Gandhi District in <i>Houston History</i> 13:1, which is based on interviews with the corridor's founding merchants; on institutions' published histories, which are self-reported; and on the contemporary press. The <a href="https://haaa.rice.edu/" target="_blank" rel="noopener">Houston Asian American Archive</a> at Rice holds oral histories with Indian American narrators in Houston. A full bibliography and a record-by-record evidence table are on the <a href="sources.html">sources</a> page.</p>
+
+  <blockquote>
+    <p>&ldquo;There are lots more resources now than before. When we came thirty years ago, even the Indian grocery store was hard to find, and now there are around 300.&rdquo;</p>
+    <cite>Sonal Bhuchar, oral history interview, Houston Asian American Archive, Rice University</cite>
+  </blockquote>
+
+  <h2>Corrections and contributions</h2>
+  <p>Public history depends on the people who were there. If you owned or worked in one of these businesses, worshipped at one of these institutions, or remember the corridor before it had a name, I would like to hear from you — particularly where a date or a detail here differs from what you remember. Disagreements between the record and the people in it are the most useful thing this project can collect.</p>
+  <p>I am also looking for photographs, menus, advertisements, and newsletters from the 1980s and 1990s, which survive almost nowhere except in family hands.</p>
+  <p class="fine">[ADD YOUR CONTACT EMAIL HERE]</p>
+
+  <h2>Author</h2>
+  <p class="fine">[YOUR NAME]. Basemap &copy; OpenStreetMap contributors, &copy; CARTO.</p>
+</div>
+</body>
+</html>

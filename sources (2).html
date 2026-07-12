@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sources &mdash; From Hillcroft to Katy</title>
+<meta name="description" content="Annotated bibliography, record-by-record evidence table, open source conflicts, and archival research agenda."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F6F3;
+  --paper-2:#EFEDE7;
+  --ink:#15181C;
+  --ink-soft:#5A6068;
+  --rule:#D6D3CA;
+  --topper:#A8232E;      /* the red trim on the Gandhi District street toppers */
+  --guide:#1F4739;       /* Texas highway guide-sign green */
+  --core:#15181C;
+  --focus:#0B63CE;
+  --c-business:#8A5A1F;
+  --c-restaurant:#A8232E;
+  --c-religious:#1F4739;
+  --c-civic:#2C4B6E;
+  --c-milestone:#5B3A72;
+  --c-lead:#8A8378;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--rule);padding:28px 0 26px;background:var(--paper)}
+.slug{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--topper);display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.slug::before{content:"";width:26px;height:3px;background:var(--topper)}
+h1{font-size:clamp(28px,3.4vw,42px);line-height:1.08;max-width:22ch}
+.sub{font-family:"IBM Plex Sans",sans-serif;font-size:17px;color:var(--ink-soft);margin:8px 0 0;font-style:italic}
+h1 em{font-style:normal;color:var(--topper)}
+.thesis{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:44px;margin-top:22px;align-items:start}
+.dek{font-size:15.5px;color:var(--ink-soft);max-width:62ch;margin:0 0 12px}
+.dek strong{color:var(--ink);font-weight:600}
+blockquote{margin:0;padding-left:18px;border-left:3px solid var(--guide);font-size:16px}
+blockquote p{margin:0 0 8px}
+blockquote cite{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em;display:block}
+
+/* ---------- workspace ---------- */
+.workspace{display:grid;grid-template-columns:236px minmax(0,1fr) 320px;gap:0;border-bottom:1px solid var(--rule)}
+.rail,.detail{padding:22px 20px;border-right:1px solid var(--rule);background:var(--paper-2)}
+.detail{border-right:0;border-left:1px solid var(--rule);overflow-y:auto}
+.rail{overflow-y:auto}
+.stage{position:relative;min-height:560px}
+#map{position:absolute;inset:0;background:var(--paper-2)}
+.leaflet-container{font-family:"IBM Plex Sans",sans-serif;background:#E8E6DF}
+
+.rail h2,.detail h2{font-size:12px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.rail section{margin-bottom:22px}
+.opt{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:13.5px}
+.opt input{accent-color:var(--topper);margin:0;flex:none}
+.opt .swatch{width:9px;height:9px;border-radius:50%;flex:none}
+.opt .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft)}
+.opt.dim{opacity:.42}
+input[type=search]{width:100%;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);border-radius:0;font:inherit;font-size:13.5px}
+.btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);padding:6px 9px;cursor:pointer;color:var(--ink-soft)}
+.btn:hover{border-color:var(--ink);color:var(--ink)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- detail panel ---------- */
+.empty{color:var(--ink-soft);font-size:13.5px}
+.rec-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;line-height:1.15;margin:6px 0 2px}
+.rec-year{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--topper);letter-spacing:.04em}
+.rec-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft);margin:10px 0;padding:8px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:3px}
+.rec-meta b{font-weight:400;color:var(--ink)}
+.rec-sum{font-size:14px}
+.facts{margin:12px 0 0;padding:0;list-style:none;font-size:13.5px}
+.facts li{padding-left:14px;position:relative;margin-bottom:5px}
+.facts li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--rule)}
+.prompt{margin-top:14px;padding:11px 12px;background:var(--paper);border-left:3px solid var(--guide);font-size:13px}
+.prompt span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--guide);margin-bottom:4px}
+.srcs{margin-top:14px;font-size:12.5px}
+.srcs a{display:block;margin-bottom:4px;color:var(--ink-soft)}
+.srcs a:hover{color:var(--ink)}
+.flag{margin-top:12px;padding:10px 12px;background:#FBF0D9;border-left:3px solid #C08A1E;font-size:12.5px}
+
+/* evidence pills */
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.pill.high{color:var(--guide)}
+.pill.medium{color:#8A5A1F}
+.pill.lead{color:var(--c-lead)}
+.pill.disputed{color:var(--topper)}
+
+/* ---------- markers ---------- */
+.pin{display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .12s}
+.pin.approx{border-style:dashed;border-color:var(--paper);opacity:.9}
+.pin.sel{transform:scale(1.45);box-shadow:0 0 0 3px var(--ink)}
+.pin.closed{background:var(--paper)!important;box-shadow:inset 0 0 0 3px currentColor,0 1px 3px rgba(0,0,0,.35)}
+
+/* ---------- drift chart ---------- */
+.drift{padding:26px 0 40px}
+.drift-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:14px}
+.drift-head h2{font-size:22px}
+.drift-head p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:64ch}
+#drift{width:100%;height:340px;display:block}
+.dx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-soft)}
+.dot{cursor:pointer}
+.dot:hover{stroke:var(--ink);stroke-width:2}
+
+/* ---------- scrubber ---------- */
+.scrub{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-2);padding:16px 0}
+.scrub .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.scrub label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.year{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;min-width:3.6ch}
+input[type=range]{flex:1;min-width:220px;accent-color:var(--topper)}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+
+footer{padding:30px 0 60px;color:var(--ink-soft);font-size:12.5px}
+footer p{max-width:78ch}
+
+@media (max-width:1080px){
+  .workspace{grid-template-columns:1fr}
+  .rail,.detail{border:0;border-bottom:1px solid var(--rule)}
+  .stage{min-height:440px;height:60vh}
+  .thesis{grid-template-columns:1fr;gap:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.nav{display:flex;gap:22px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{color:var(--ink-soft);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.nav a.here{color:var(--topper);border-bottom:2px solid var(--topper);padding-bottom:2px}
+.nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:.06em}
+
+.page{max-width:900px;margin:0 auto;padding:52px 24px 90px}
+.page h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1;margin-bottom:6px}
+.page .sub{font-style:italic;color:var(--ink-soft);font-size:17px;margin:0 0 40px}
+.page h2{font-size:13px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--topper);margin:48px 0 14px;padding-top:18px;border-top:1px solid var(--rule)}
+.page h3{font-size:16px;margin:22px 0 4px}
+.page p{font-size:15.5px;line-height:1.6;margin:0 0 14px;color:#2A2F35;max-width:74ch}
+.page a{color:var(--ink)}
+.bib{margin:0 0 22px}
+.bib .entry{padding:14px 0;border-bottom:1px solid var(--rule)}
+.bib .entry:last-child{border-bottom:0}
+.bib .cite{font-size:15.5px;line-height:1.5;color:var(--ink)}
+.bib .note{font-size:13.5px;color:var(--ink-soft);margin-top:5px;line-height:1.5}
+.bib .kind{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--guide);display:block;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:13.5px}
+th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;padding:0 10px 8px 0;border-bottom:1px solid var(--ink)}
+td{padding:11px 10px 11px 0;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.45}
+td.yr{font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.ylab{font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+td.src{font-size:12.5px}
+td.src a{color:var(--ink-soft);display:block;margin-bottom:3px}
+td.src a:hover{color:var(--ink)}
+td.gap{font-size:12.5px;color:var(--ink-soft);max-width:190px}
+.pill.conflict{color:var(--topper)}
+.pill.High,.pill.high{color:var(--guide)}
+.conf{padding:16px 0 16px 18px;border-left:3px solid #C08A1E;background:#FBF0D9;margin-bottom:14px;padding-right:16px}
+.conf h3{margin:0 0 6px;font-size:15px}
+.conf p{margin:0;font-size:14px;color:#4A4438}
+.agenda li{position:relative;padding-left:26px;margin-bottom:12px;font-size:15px;line-height:1.55;color:#2A2F35;list-style:none}
+.agenda{padding:0;margin:0 0 16px;counter-reset:a}
+.agenda li::before{counter-increment:a;content:counter(a,decimal-leading-zero);position:absolute;left:0;top:1px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--topper)}
+.nav{display:flex;gap:22px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{color:var(--ink-soft);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.nav a.here{color:var(--topper);border-bottom:2px solid var(--topper);padding-bottom:2px}
+.nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:.06em}
+@media(max-width:760px){td.gap,th.gap{display:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="nav">
+    <span class="brand">From Hillcroft to Katy</span>
+    <a href="index.html">The map</a>
+    <a href="about.html">About</a>
+    <a href="sources.html" class="here">Sources</a>
+    <a href="media.html">Media &amp; artifacts</a>
+    <a href="scholarship.html">Scholarship</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Sources</h1>
+  <p class="sub">Bibliography, evidence table, open conflicts, and what has not yet been consulted</p>
+
+  <p>Every record on the map is listed below with the sources behind it and what remains outstanding. Where published accounts disagree, the disagreement is stated rather than settled. Records marked <span class="pill lead">Lead</span> are unverified.</p>
+
+  <h2>Principal sources</h2>
+  <div class="bib">
+    <div class="entry">
+      <span class="kind">Secondary — interview-based</span>
+      <div class="cite">LaRotta, Alex. &ldquo;Pass the Naan: The Story of Houston&rsquo;s Mahatma Gandhi District.&rdquo; <i>Houston History</i> 13, no. 1: 33&ndash;35. <a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">PDF</a></div>
+      <div class="note">Based on interviews with the corridor's founding merchants (Sharan Gahunia of Raja Sweets, Kaiser Lashkari of Himalaya, Animesh Patel of Subhlaxmi Grocers), with Mayor Annise Parker, and with India Culture Center trustees. Produced through the University of Houston's Gulf Coast Food Project. Supplies the dates used here for Karat 22, Raja Sweets, India Grocers, and Himalaya, several of which differ from the dates in general circulation online.</div>
+    </div>
+    <div class="entry">
+      <span class="kind">Primary — oral history collection</span>
+      <div class="cite">Houston Asian American Archive, Chao Center for Asian Studies, Rice University. <a href="https://haaa.rice.edu/" target="_blank" rel="noopener">haaa.rice.edu</a>. Physical collection: MS 573, Woodson Research Center, Fondren Library.</div>
+      <div class="note">Over 500 published oral histories, roughly fifty with Indian American narrators, transcripts online. Not yet worked for this project. Rice's own metadata notes that some transcripts carry AI-generated accessibility enhancements and may contain errors, so quotations must be checked against the recording.</div>
+    </div>
+    <div class="entry">
+      <span class="kind">Primary — institutional self-report</span>
+      <div class="cite">India Culture Center, <a href="https://icchoustontx.org/history/" target="_blank" rel="noopener">official history</a>. Sikh Center of the Gulf Coast Area, <a href="https://sikhcenterhouston.org/" target="_blank" rel="noopener">official site</a>. Sikh National Center, <a href="https://sikhnationalcenter.org/about/" target="_blank" rel="noopener">about</a>. BAPS Houston. Sri Meenakshi Temple Society.</div>
+      <div class="note">Self-reported. Useful for dates of incorporation, founding narratives, and stated reasons for relocation, none of it independently verified. The Sikh National Center's account of why it left its first gurdwara (an outgrown building, and a landfill developed behind the property) is a causal claim that county permit records could corroborate.</div>
+    </div>
+    <div class="entry">
+      <span class="kind">Secondary — press</span>
+      <div class="cite">Houston Chronicle; <i>Texas Highways</i>; <i>Houstonia</i>; Eater Houston; Houston Food Finder; GQ.</div>
+      <div class="note">Used for openings, closures, and relocations after 2000, where the press is the only public record. Food journalism is unreliable on founding years, and routinely conflates a proprietor's first restaurant with their best-known one. The Himalaya conflict below is an instance.</div>
+    </div>
+    <div class="entry">
+      <span class="kind">Reference — used with caution</span>
+      <div class="cite">Wikipedia, <i>Mahatma Gandhi District, Houston</i> and related entries.</div>
+      <div class="note">Used to locate underlying citations, not as authority. It is the origin of the 1985 date for Raja Sweets that the LaRotta interview contradicts.</div>
+    </div>
+  </div>
+
+  <h2>Open source conflicts</h2>
+  <p>Two dates in this dataset are contested in print. They are recorded unresolved.</p>
+  <div class="conf"><h3>Sikh Center of the Gulf Coast Area</h3><p>Date correction. November 1973 refers to the building&#x27;s inauguration; the congregation dates its golden jubilee from that month. The organization itself was founded in 1972. Both dates are recorded here rather than collapsed into one.</p></div>
+<div class="conf"><h3>Raja Sweets</h3><p>Source conflict, resolved provisionally. Wikipedia gives 1985; Alex LaRotta, who interviewed the founder&#x27;s daughter for Houston History, gives 1986. The interview is the stronger source. 1985 should be treated as an artifact unless a contemporary advertisement or filing establishes it.</p></div>
+<div class="conf"><h3>Bombay Sweets</h3><p>The 1997 date is well attested. The claim that this was Houston&#x27;s first pure vegetarian Indian restaurant originates in the business&#x27;s own marketing and is repeated verbatim by review aggregators — the characteristic signature of a self-report in circulation. It is recorded here as a claim, not a finding.</p></div>
+<div class="conf"><h3>Indika</h3><p>Two source conflicts. (1) The original 2001–2006 location is variously described as a small space in southwest Houston and as Memorial; it cannot be placed with confidence, and this marker therefore stands at the Montrose address the restaurant occupied from 2006. (2) In a 2013 interview Jaisinghani gave the opening year as 2002; her own restaurant&#x27;s published biography gives July 2001. A narrator&#x27;s memory of her own founding year is off by a year — a caution worth carrying into any use of oral testimony.</p></div>
+<div class="conf"><h3>Himalaya Restaurant</h3><p>Source conflict, unresolved. GQ gives 1994. LaRotta, who interviewed Lashkari directly for Houston History, records that Himalaya opened in 2004 and that Lashkari operated a different restaurant nearby in the early 1990s. The published dates appear to conflate the two establishments. A health permit or assumed-name filing would settle it.</p></div>
+
+
+  <h2>Evidence by record</h2>
+  <table>
+    <thead><tr><th>Year</th><th>Record</th><th>Evidence</th><th>Sources</th><th class="gap">Outstanding</th></tr></thead>
+    <tbody>
+    <tr>
+      <td class="yr mono">1972</td>
+      <td><b>Sikh Center of the Gulf Coast Area</b><div class="ylab mono">1972 founded by five families · building inaugurated November 1973</div></td>
+      <td><span class="pill conflict">Source conflict</span></td>
+      <td class="src"><a href="https://sikhcenterhouston.org/" target="_blank" rel="noopener">Sikh Center of the Gulf Coast Area — official site (founded 1972)</a><br><a href="https://www.sikhnet.com/news/brief-history-sikh-center-houston" target="_blank" rel="noopener">SikhNet, A Brief History of The Sikh Center, Houston</a></td>
+      <td class="gap">coordinates unverified; published sources disagree; see map record</td>
+    </tr>
+<tr>
+      <td class="yr mono">1973</td>
+      <td><b>India Culture Center founded</b><div class="ylab mono">June 27, 1973</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://icchoustontx.org/history/" target="_blank" rel="noopener">India Culture Center — official history</a><br><a href="https://indoamerican-news.com/india-culture-center-icc-looking-back-a-journey-of-40-years/" target="_blank" rel="noopener">Indo American News, ICC at 40</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1977</td>
+      <td><b>Sri Meenakshi Devasthanam</b><div class="ylab mono">1977 society · 1982 shrine · 1995 rajagopuram</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://en.wikipedia.org/wiki/Sri_Meenakshi_Temple_(Brazoria_County,_Texas)" target="_blank" rel="noopener">Temple history and source trail</a><br><a href="https://www.meenakshi.org/" target="_blank" rel="noopener">Official temple site</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1977</td>
+      <td><b>BAPS Shri Swaminarayan Mandir</b><div class="ylab mono">1977 gatherings · 1988 first mandir · 2004 stone mandir</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://en.wikipedia.org/wiki/BAPS_Shri_Swaminarayan_Mandir_Houston" target="_blank" rel="noopener">BAPS Houston history</a><br><a href="https://www.visithoustontexas.com/blog/post/debut-in-hou-cultural-centers-in-houston/" target="_blank" rel="noopener">Visit Houston, cultural centers</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1983</td>
+      <td><b>Jay Stores (unverified)</b><div class="ylab mono">c. 1983 — unconfirmed</div></td>
+      <td><span class="pill lead">Lead</span></td>
+      <td class="src"><a href="https://en.wikipedia.org/wiki/Mahatma_Gandhi_District,_Houston" target="_blank" rel="noopener">Mahatma Gandhi District — source trail</a></td>
+      <td class="gap">coordinates unverified; record unverified — do not cite</td>
+    </tr>
+<tr>
+      <td class="yr mono">1984</td>
+      <td><b>Karat 22 Jewelers</b><div class="ylab mono">1984</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1984</td>
+      <td><b>Commercial context: the Sharpstown strip-center boom</b><div class="ylab mono">early-to-mid 1980s</div></td>
+      <td><span class="pill medium">Medium</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1986</td>
+      <td><b>India Grocers</b><div class="ylab mono">mid-1980s (exact year unconfirmed)</div></td>
+      <td><span class="pill medium">Medium</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">1986</td>
+      <td><b>Raja Sweets</b><div class="ylab mono">1986</div></td>
+      <td><span class="pill conflict">Source conflict</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a><br><a href="https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/" target="_blank" rel="noopener">Texas Highways on the district</a></td>
+      <td class="gap">coordinates approximate; published sources disagree; see map record</td>
+    </tr>
+<tr>
+      <td class="yr mono">1995</td>
+      <td><b>Subhlaxmi Grocers</b><div class="ylab mono">founding year unknown — placeholder</div></td>
+      <td><span class="pill lead">Lead</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a><br><a href="https://subhlaxmigrocers.com/" target="_blank" rel="noopener">Subhlaxmi Grocers</a></td>
+      <td class="gap">coordinates approximate; record unverified — do not cite</td>
+    </tr>
+<tr>
+      <td class="yr mono">1997</td>
+      <td><b>Bombay Sweets</b><div class="ylab mono">1997</div></td>
+      <td><span class="pill conflict">Source conflict</span></td>
+      <td class="src"><a href="https://www.houstoniamag.com/businesses/bombay-sweets" target="_blank" rel="noopener">Houstonia Magazine (serving since 1997)</a><br><a href="https://www.bombaysweetshtx.com/" target="_blank" rel="noopener">Bombay Sweets — official site</a></td>
+      <td class="gap">coordinates approximate; published sources disagree; see map record</td>
+    </tr>
+<tr>
+      <td class="yr mono">2001</td>
+      <td><b>Aga&#x27;s Restaurant — original</b><div class="ylab mono">2001 · expanded 2011</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://www.chron.com/food/article/houston-restaurant-agas-opening-katy-21314083.php" target="_blank" rel="noopener">Chronicle on Aga&#x27;s expansion and history</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2001</td>
+      <td><b>Indika</b><div class="ylab mono">July 2001 · moved to Montrose 2006 · CLOSED 2016</div></td>
+      <td><span class="pill conflict">Source conflict</span></td>
+      <td class="src"><a href="https://www.pondicheri.com/our-team/" target="_blank" rel="noopener">Pondicheri — chef biography</a><br><a href="https://houstonfoodfinder.com/news/new-indian-cookbook-from-houston-chef-ready-to-add-to-your-collection/" target="_blank" rel="noopener">Houston Food Finder (operated Indika 2001–2016)</a><br><a href="https://www.recipe4success.org/chefs/anita-jaisinghani.html" target="_blank" rel="noopener">Recipe for Success chef bio (July 2001, moved 2006)</a></td>
+      <td class="gap">coordinates approximate; published sources disagree; see map record</td>
+    </tr>
+<tr>
+      <td class="yr mono">2004</td>
+      <td><b>Himalaya Restaurant</b><div class="ylab mono">2004 (a prior Lashkari eatery, early 1990s)</div></td>
+      <td><span class="pill conflict">Source conflict</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a><br><a href="https://www.gq.com/story/new-classic-american-restaurants" target="_blank" rel="noopener">GQ, New Classic American Restaurants (gives 1994)</a></td>
+      <td class="gap">coordinates approximate; published sources disagree; see map record</td>
+    </tr>
+<tr>
+      <td class="yr mono">2006</td>
+      <td><b>Sikh National Center</b><div class="ylab mono">33 acres bought Dec 1999 · groundbreaking Nov 4, 2006</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://sikhnationalcenter.org/about/" target="_blank" rel="noopener">Sikh National Center — About (landfill, 33 acres, groundbreaking)</a></td>
+      <td class="gap">coordinates unverified</td>
+    </tr>
+<tr>
+      <td class="yr mono">2007</td>
+      <td><b>India House</b><div class="ylab mono">2000 land purchase · built 2003–2007</div></td>
+      <td><span class="pill medium">Medium</span></td>
+      <td class="src"><a href="https://icchoustontx.org/history/" target="_blank" rel="noopener">India Culture Center history</a><br><a href="https://authentictexas.com/houstons-mahatma-gandhi-district-celebrates-south-asian-culture/" target="_blank" rel="noopener">Authentic Texas on the district</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2009</td>
+      <td><b>Houston Asian American Archive (Rice)</b><div class="ylab mono">founded 2009</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://haaa.rice.edu/" target="_blank" rel="noopener">Houston Asian American Archive</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2010</td>
+      <td><b>Mahatma Gandhi District designation</b><div class="ylab mono">January 16, 2010</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://houstonhistorymagazine.org/wp-content/uploads/2016/03/Mahatma-Gandhi-District.pdf" target="_blank" rel="noopener">LaRotta, &quot;Pass the Naan,&quot; Houston History Magazine 13:1</a><br><a href="https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/" target="_blank" rel="noopener">Texas Highways</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2011</td>
+      <td><b>Pondicheri</b><div class="ylab mono">March 1, 2011</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://www.pondicheri.com/our-team/" target="_blank" rel="noopener">Pondicheri — chef biography</a><br><a href="http://www.inspiringhoustonwomen.com/2013/12/anita-jaisinghani.html" target="_blank" rel="noopener">Interview: opened March 1, 2011; 2800 Kirby</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2013</td>
+      <td><b>Sai Durga Shiva Vishnu Temple, Katy</b><div class="ylab mono">2013–2014 (details to verify)</div></td>
+      <td><span class="pill medium">Medium</span></td>
+      <td class="src"><a href="https://en.wikipedia.org/wiki/Greater_Katy" target="_blank" rel="noopener">Greater Katy religious history</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2018</td>
+      <td><b>Katy Asian Town &amp; H Mart</b><div class="ylab mono">2018</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://houston.eater.com/maps/katy-asian-town-best-restaurants-houston" target="_blank" rel="noopener">Eater Houston on Katy Asian Town</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+<tr>
+      <td class="yr mono">2022</td>
+      <td><b>Eternal Gandhi Museum Houston</b><div class="ylab mono">opened late 2022</div></td>
+      <td><span class="pill lead">Lead</span></td>
+      <td class="src"><a href="https://texashighways.com/culture/the-mahatma-gandhi-district-is-the-epicenter-of-indian-culture-in-texas/" target="_blank" rel="noopener">Texas Highways (mentions the museum&#x27;s planned opening)</a></td>
+      <td class="gap">coordinates unverified; record unverified — do not cite</td>
+    </tr>
+<tr>
+      <td class="yr mono">2026</td>
+      <td><b>Aga&#x27;s Restaurant — Katy</b><div class="ylab mono">June 24, 2026</div></td>
+      <td><span class="pill high">High</span></td>
+      <td class="src"><a href="https://www.houstonchronicle.com/food-restaurants/article/agas-katy-open-monday-22281060.php" target="_blank" rel="noopener">Houston Chronicle on the Katy opening</a></td>
+      <td class="gap">coordinates approximate</td>
+    </tr>
+
+    </tbody>
+  </table>
+
+  <h2>Not yet consulted</h2>
+  <p>These are the archives that would settle most of what is still open. Almost none of what they hold is online.</p>
+  <ol class="agenda">
+    <li><b>Harris County and Fort Bend County assumed-name (DBA) filings.</b> Dated, indexed, public. The most direct record of when a business legally began trading, and the way to settle the Jay Stores, India Grocers, and Subhlaxmi dates.</li>
+    <li><b>Houston city directories and telephone books, 1978&ndash;1995.</b> Houston Public Library, Texas Room. A business appearing and then disappearing across successive annual volumes is the closest available proxy for opening and closing, and the only way to find the closures this dataset cannot currently see.</li>
+    <li><b>Houston Chronicle historical archive.</b> Accessible remotely with a Houston Public Library card. Opening announcements, closures, and &mdash; more valuable &mdash; the advertisements themselves, which carry addresses and dates.</li>
+    <li><b>Community newspapers.</b> <i>Indo-American News</i> and <i>Voice of Asia</i>. Advertisements, opening notices, and community coverage that appears nowhere else.</li>
+    <li><b>Harris County property and deed records, and City of Houston permit files.</b> Including the landfill siting behind the Prairie Drive gurdwara.</li>
+    <li><b>HAAA oral history transcripts.</b> Roughly fifty Indian American interviews. Narrators include Sonal and Vinod Bhuchar (Fort Bend), Anita Jaisinghani (restaurants), Sesh and Prabha Bala, Sulekh Jain, Rathna Kumar, and Sam Kannappan.</li>
+    <li><b>Family-held papers.</b> Photographs, menus, invoices, and ephemera held by the founding families. Uncatalogued, and the likeliest place for the corridor's earliest documentation to survive.</li>
+  </ol>
+
+  <h2>Citation</h2>
+  <p class="fine" style="font-size:13.5px;color:var(--ink-soft)"><i>From Hillcroft to Katy: A Geography of South Asian Houston, 1972&ndash;2026.</i> [YOUR NAME]. Working dataset, 2026.</p>
+</div>
+
+</body>
+</html>
