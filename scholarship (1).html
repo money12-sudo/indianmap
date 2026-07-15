@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Scholarship &mdash; Indian Houston: A Geographic Survey</title>
+<meta name="description" content="The academic literature this project sits inside: the ethnoburb, ethnic enclave economies, and the demography of Asian Houston."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F6F3;
+  --paper-2:#EFEDE7;
+  --ink:#15181C;
+  --ink-soft:#5A6068;
+  --rule:#D6D3CA;
+  --topper:#A8232E;      /* the red trim on the Gandhi District street toppers */
+  --guide:#1F4739;       /* Texas highway guide-sign green */
+  --core:#15181C;
+  --focus:#0B63CE;
+  --c-business:#8A5A1F;
+  --c-restaurant:#A8232E;
+  --c-religious:#1F4739;
+  --c-civic:#2C4B6E;
+  --c-milestone:#5B3A72;
+  --c-lead:#8A8378;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Space Grotesk",system-ui,sans-serif;font-weight:700;letter-spacing:-0.02em;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:1px solid var(--rule);padding:28px 0 26px;background:var(--paper)}
+.slug{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--topper);display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.slug::before{content:"";width:26px;height:3px;background:var(--topper)}
+h1{font-size:clamp(28px,3.4vw,42px);line-height:1.08;max-width:22ch}
+.sub{font-family:"IBM Plex Sans",sans-serif;font-size:17px;color:var(--ink-soft);margin:8px 0 0;font-style:italic}
+h1 em{font-style:normal;color:var(--topper)}
+.thesis{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:44px;margin-top:22px;align-items:start}
+.dek{font-size:15.5px;color:var(--ink-soft);max-width:62ch;margin:0 0 12px}
+.dek strong{color:var(--ink);font-weight:600}
+blockquote{margin:0;padding-left:18px;border-left:3px solid var(--guide);font-size:16px}
+blockquote p{margin:0 0 8px}
+blockquote cite{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em;display:block}
+
+/* ---------- workspace ---------- */
+.workspace{display:grid;grid-template-columns:236px minmax(0,1fr) 320px;gap:0;border-bottom:1px solid var(--rule)}
+.rail,.detail{padding:22px 20px;border-right:1px solid var(--rule);background:var(--paper-2)}
+.detail{border-right:0;border-left:1px solid var(--rule);overflow-y:auto}
+.rail{overflow-y:auto}
+.stage{position:relative;min-height:560px}
+#map{position:absolute;inset:0;background:var(--paper-2)}
+.leaflet-container{font-family:"IBM Plex Sans",sans-serif;background:#E8E6DF}
+
+.rail h2,.detail h2{font-size:12px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.rail section{margin-bottom:22px}
+.opt{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:13.5px}
+.opt input{accent-color:var(--topper);margin:0;flex:none}
+.opt .swatch{width:9px;height:9px;border-radius:50%;flex:none}
+.opt .n{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft)}
+.opt.dim{opacity:.42}
+input[type=search]{width:100%;padding:8px 10px;border:1px solid var(--rule);background:var(--paper);border-radius:0;font:inherit;font-size:13.5px}
+.btn{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--rule);padding:6px 9px;cursor:pointer;color:var(--ink-soft)}
+.btn:hover{border-color:var(--ink);color:var(--ink)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- detail panel ---------- */
+.empty{color:var(--ink-soft);font-size:13.5px}
+.rec-name{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;line-height:1.15;margin:6px 0 2px}
+.rec-year{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--topper);letter-spacing:.04em}
+.rec-meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-soft);margin:10px 0;padding:8px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:3px}
+.rec-meta b{font-weight:400;color:var(--ink)}
+.rec-sum{font-size:14px}
+.facts{margin:12px 0 0;padding:0;list-style:none;font-size:13.5px}
+.facts li{padding-left:14px;position:relative;margin-bottom:5px}
+.facts li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;background:var(--rule)}
+.prompt{margin-top:14px;padding:11px 12px;background:var(--paper);border-left:3px solid var(--guide);font-size:13px}
+.prompt span{display:block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--guide);margin-bottom:4px}
+.srcs{margin-top:14px;font-size:12.5px}
+.srcs a{display:block;margin-bottom:4px;color:var(--ink-soft)}
+.srcs a:hover{color:var(--ink)}
+.flag{margin-top:12px;padding:10px 12px;background:#FBF0D9;border-left:3px solid #C08A1E;font-size:12.5px}
+
+/* evidence pills */
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.pill.high{color:var(--guide)}
+.pill.medium{color:#8A5A1F}
+.pill.lead{color:var(--c-lead)}
+.pill.disputed{color:var(--topper)}
+
+/* ---------- markers ---------- */
+.pin{display:flex;align-items:center;justify-content:center;border-radius:50%;border:2px solid var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .12s}
+.pin.approx{border-style:dashed;border-color:var(--paper);opacity:.9}
+.pin.sel{transform:scale(1.45);box-shadow:0 0 0 3px var(--ink)}
+.pin.closed{background:var(--paper)!important;box-shadow:inset 0 0 0 3px currentColor,0 1px 3px rgba(0,0,0,.35)}
+
+/* ---------- drift chart ---------- */
+.drift{padding:26px 0 40px}
+.drift-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:14px}
+.drift-head h2{font-size:22px}
+.drift-head p{margin:6px 0 0;color:var(--ink-soft);font-size:14px;max-width:64ch}
+#drift{width:100%;height:340px;display:block}
+.dx{font-family:"IBM Plex Mono",monospace;font-size:10px;fill:var(--ink-soft)}
+.dot{cursor:pointer}
+.dot:hover{stroke:var(--ink);stroke-width:2}
+
+/* ---------- scrubber ---------- */
+.scrub{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-2);padding:16px 0}
+.scrub .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.scrub label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.year{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:26px;min-width:3.6ch}
+input[type=range]{flex:1;min-width:220px;accent-color:var(--topper)}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-soft)}
+
+footer{padding:30px 0 60px;color:var(--ink-soft);font-size:12.5px}
+footer p{max-width:78ch}
+
+@media (max-width:1080px){
+  .workspace{grid-template-columns:1fr}
+  .rail,.detail{border:0;border-bottom:1px solid var(--rule)}
+  .stage{min-height:440px;height:60vh}
+  .thesis{grid-template-columns:1fr;gap:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.nav{display:flex;gap:22px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.nav a{color:var(--ink-soft);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.nav a.here{color:var(--topper);border-bottom:2px solid var(--topper);padding-bottom:2px}
+.nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:.06em}
+
+.page{max-width:820px;margin:0 auto;padding:52px 24px 90px}
+.page h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1;margin-bottom:6px}
+.page .sub{font-style:italic;color:var(--ink-soft);font-size:17px;margin:0 0 32px}
+.page h2{font-size:13px;font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--topper);margin:46px 0 6px;padding-top:18px;border-top:1px solid var(--rule)}
+.page .h2note{font-size:14px;color:var(--ink-soft);margin:0 0 12px;max-width:72ch;line-height:1.55}
+.page p{font-size:15.5px;line-height:1.62;margin:0 0 14px;color:#2A2F35;max-width:74ch}
+.page p.lede{font-size:18px;color:var(--ink);line-height:1.55}
+.entry{padding:16px 0;border-bottom:1px solid var(--rule)}
+.entry:last-child{border-bottom:0}
+.kind{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--guide);display:block;margin-bottom:5px}
+.cite{font-size:16px;line-height:1.42;font-family:"Space Grotesk",sans-serif;font-weight:500}
+.cite a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)}
+.cite a:hover{border-color:var(--ink)}
+.note{font-size:14px;color:#4A5058;line-height:1.6;max-width:72ch;margin-top:7px}
+.note a{color:var(--ink-soft)}
+.claim{margin:26px 0 0;padding:20px 22px;background:var(--paper-2);border-left:3px solid var(--guide)}
+.claim h3{font-size:17px;margin:0 0 10px}
+.claim p{font-size:15px;margin-bottom:12px;color:#3A4048}
+.claim p:last-child{margin-bottom:0}
+.unv{padding:0;margin:0;list-style:none}
+.unv li{position:relative;padding-left:20px;margin-bottom:11px;font-size:14.5px;line-height:1.55;color:#4A5058}
+.unv li::before{content:"";position:absolute;left:0;top:10px;width:7px;height:1px;background:var(--rule)}
+.unv li b{color:var(--ink);font-weight:600}
+.nav{display:flex;gap:20px;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-wrap:wrap}
+.nav a{color:var(--ink-soft);text-decoration:none}
+.nav a:hover{color:var(--ink)}
+.nav a.here{color:var(--topper);border-bottom:2px solid var(--topper);padding-bottom:2px}
+.nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <span class="brand">Indian Houston &middot; A Geographic Survey</span>
+    <a href="index.html">The map</a>
+    <a href="about.html">About</a>
+    <a href="sources.html">Sources</a>
+    <a href="media.html">Media &amp; artifacts</a>
+    <a href="scholarship.html" class="here">Scholarship</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Scholarship</h1>
+  <p class="sub">The literature this project sits inside</p>
+
+  <p class="lede">The pattern on this map already has a name. A community disperses residentially, keeps a concentrated commercial core, and grows a second cluster in the suburbs that coexists with the first rather than replacing it. Wei Li called it an <b>ethnoburb</b> in 1997, and there is now a substantial literature on it.</p>
+  <p>That is not bad news for this project. It means the finding is real, and it means the argument can be made against an established model rather than from scratch.</p>
+
+  <h2>The ethnoburb</h2>
+  <div class="entry"><span class="kind">The concept</span><div class="cite"><a href="https://journals.sagepub.com/doi/10.1080/0042098984871" target="_blank" rel="noopener">Li, Wei. &ldquo;Anatomy of a New Ethnic Settlement: The Chinese Ethnoburb in Los Angeles.&rdquo; <i>Urban Studies</i> 35, no. 3 (1998): 479&ndash;501.</a></div><div class="note">The paper that named the thing. Li proposes the <b>ethnoburb</b>: a suburban ethnic cluster of residential areas and business districts, multiethnic, in which one group is concentrated without forming a majority. Ethnoburbs are not the enclave and not the assimilated suburb. They are a third form, and they <i>coexist with</i> rather than replace the old downtown district. Everything this project has found in Houston, Li found in the San Gabriel Valley thirty years ago.</div></div><div class="entry"><span class="kind">The book</span><div class="cite"><a href="https://uhpress.hawaii.edu/title/ethnoburb-the-new-ethnic-community-in-urban-america/" target="_blank" rel="noopener">Li, Wei. <i>Ethnoburb: The New Ethnic Community in Urban America.</i> Honolulu: University of Hawai&lsquo;i Press, 2009.</a></div><div class="note">The full treatment. Interviews, census analysis, fieldwork. The argument that matters here: the growth of ethnoburbs since the 1960s <b>contradicts</b> the assumption that ethnicity dissolves as immigrants move out of the inner city. What the San Gabriel Valley shows is ethnic persistence, not assimilation. Available to borrow at the <a href='https://archive.org/details/ethnoburbnewethn0000liwe' target='_blank' rel='noopener'>Internet Archive</a> and via <a href='https://muse.jhu.edu/pub/5/monograph/book/8237' target='_blank' rel='noopener'>Project MUSE</a>.</div></div><div class="entry"><span class="kind">The comparison</span><div class="cite"><a href="https://en.wikipedia.org/wiki/Ethnoburb" target="_blank" rel="noopener">Li, Wei. &ldquo;Ethnoburb versus Chinatown: Two Types of Urban Ethnic Communities in Los Angeles.&rdquo;</a></div><div class="note">The two-center model, stated directly: an old core and a new suburban cluster, operating at the same time as different kinds of place. This is the Hillcroft&ndash;Katy relationship, described in Los Angeles before this project began. (Linked to the overview article; find the paper itself through a library.)</div></div>
+
+  <h2>Houston: demography and urban form</h2>
+  <div class="entry"><span class="kind">Data</span><div class="cite"><a href="https://kinder.rice.edu/asian-american-community-study" target="_blank" rel="noopener">Kinder Institute for Urban Research, <i>Asian American Community Study</i>. Rice University, 2026.</a></div><div class="note">Published 12 January 2026. A multi-year, multilingual survey of 2,100 Asian residents across Harris, Fort Bend, Montgomery, and Brazoria counties, and it draws on the Houston Asian American Archive's oral histories. It contains the residential data this map does not have: <b>census-tract maps of the Asian population in 1980 and in 2023</b>. Everything on this site is commercial and institutional. Kinder has where people actually lived.</div></div><div class="entry"><span class="kind">Data</span><div class="cite"><a href="https://news.rice.edu/news/2026/kinder-institute-releases-comprehensive-study-one-houston-areas-fastest-growing" target="_blank" rel="noopener">Kinder Institute releases comprehensive study of one of Houston area's fastest-growing populations.</a></div><div class="note">The headline figures. The region's Asian population rose from 1.8% to 9.9% over four decades. Between 2010 and 2023 it grew <b>117% in Fort Bend County</b>. Indians are the largest Asian group at roughly 150,000. And the line worth quoting: more Asian residents live in Fort Bend County today than lived in the entire state of Texas in 1980.</div></div><div class="entry"><span class="kind">Data</span><div class="cite"><a href="https://kinder.rice.edu/has/" target="_blank" rel="noopener">Kinder Houston Area Survey. Rice University, 1982&ndash;.</a></div><div class="note">Forty-three consecutive years of survey data on Harris County, extended to Fort Bend and Montgomery. Over 50,000 respondents. No other American metropolitan area has anything like it, and it covers exactly the decades this project is about.</div></div><div class="entry"><span class="kind">Context</span><div class="cite"><a href="https://kinder.rice.edu/issue/immigration" target="_blank" rel="noopener">Kinder Institute &mdash; Immigration research.</a></div><div class="note">Includes work on Gulfton and Sharpstown, the neighborhoods the Hillcroft corridor sits inside, and on housing regulation that is, in their phrase, uniquely Houston. The no-zoning question runs through this material.</div></div>
+
+  <div class="claim">
+    <h3>Where this project sits</h3>
+    <p>The ethnoburb literature has already established the pattern: an old ethnic core persists while a suburban cluster forms alongside it, and ethnicity does not dissolve on contact with the suburbs. This project does not discover that. It tests whether the model holds for a community and a city it was not built from &mdash; Indian Houston rather than Chinese Los Angeles.</p>
+    <p>The variable Houston supplies, and Li's cases do not, is <b>the absence of zoning</b>. Los Angeles has a zoning code. Houston has none. If the ethnoburb model rests on land-use regulation pushing immigrant retail into particular places, then Houston is the case that tests it &mdash; because here the constraint is not the city's zoning map but the private deed restrictions of master-planned suburbs, which are a different instrument with different effects and a different history.</p>
+    <p>That is the opening a paper could occupy: not a new finding, but the same finding in the one large American city that lacks the mechanism the existing explanations rely on.</p>
+  </div>
+
+  <h2>Further reading</h2>
+  <p class="h2note">Standard works in the field, cited from the literature rather than located in this session. <b>Verify each citation before use.</b> They are listed here as a reading path, not as evidence.</p>
+  <ul class="unv">
+    <li><b>Portes, Alejandro, and Kenneth Wilson.</b> The immigrant-enclave economy. The theoretical foundation for treating an ethnic business district as an economic form rather than a cultural one.</li>
+    <li><b>Rangaswamy, Padma.</b> <i>Namast&eacute; America: Indian Immigrants in an American Metropolis</i> (Chicago). The closest existing analogue to what this project is attempting.</li>
+    <li><b>Khandelwal, Madhulika.</b> <i>Becoming American, Being Indian</i> (Queens, New York). Indian community formation in a second American metropolis.</li>
+    <li><b>Kurien, Prema.</b> On Hindu religious institution-building in the American diaspora &mdash; directly relevant to the temples and gurdwaras in this dataset.</li>
+    <li><b>Chakravorty, Sanjoy, Devesh Kapur, and Nirvikar Singh.</b> <i>The Other One Percent: Indians in America.</i> The demographic and visa-category history that explains who arrived when.</li>
+    <li><b>Lung-Amam, Willow.</b> <i>Trespassers? Asian Americans and the Battle for Suburbia</i> (Silicon Valley). School districts, design codes, and who suburbs are built for. The suburban-conflict half of the story this project has not touched.</li>
+    <li><b>Lin, Jan.</b> On Houston and on ethnic place-making in American cities.</li>
+    <li><b>Klineberg, Stephen.</b> <i>Prophetic City: Houston on the Cusp of a Changed America.</i> The demographic transformation of Houston by the founder of the Kinder Houston Area Survey.</li>
+  </ul>
+</div>
+</body>
+</html>
